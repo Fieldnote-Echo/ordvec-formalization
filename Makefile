@@ -7,7 +7,7 @@ verify:
 	lake build --wfail OrdvecFormalization.Verify
 
 audit:
-	! rg -n '\bsorry\b|sorryAx' OrdvecFormalization OrdvecFormalization.lean README.md
+	! rg -n '\bsorry\b|sorryAx' OrdvecFormalization OrdvecFormalization.lean README.md docs
 
 lint:
 	lake exe runLinter OrdvecFormalization

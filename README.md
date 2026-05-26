@@ -55,7 +55,11 @@ a version bump. Sibling to `reccs-/cd-/fd-formalization`.
    The final citation theorem uses a strict parameter inequality `θ₀ < θ₁`, a
    bundled `Prior`, and a threshold in actual overlap coordinates:
    `OrdvecFormalization.overlapNull_threshold_isBayesOptimal`.
+   Paper-language aliases are also checked:
+   `literal_fnch_overlap_has_mlr`, `fnch_overlap_admit_threshold`, and
+   `fnch_overlap_threshold_bayes_optimal`.
 
+The reviewer-facing statement map is in [`docs/theorem-map.md`](docs/theorem-map.md).
 The dashboard in [`OrdvecFormalization/Verify.lean`](OrdvecFormalization/Verify.lean)
 checks the theorem names and prints the axiom audit for:
 
@@ -85,6 +89,9 @@ overlapNull_fnch_hasMLR
 overlapNull_bayesAdmit_isThreshold
 overlapNull_threshold_bayesRisk_optimal
 overlapNull_threshold_isBayesOptimal
+literal_fnch_overlap_has_mlr
+fnch_overlap_admit_threshold
+fnch_overlap_threshold_bayes_optimal
 ```
 
 Expected axioms are only Lean's standard kernel baseline:
@@ -124,6 +131,8 @@ OrdvecFormalization/
 ├── OverlapNull.lean       # paper-facing theorem surface
 ├── Examples.lean
 └── Verify.lean
+docs/
+└── theorem-map.md
 ```
 
 ## Future Mathlib / project layers

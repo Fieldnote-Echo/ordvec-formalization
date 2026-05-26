@@ -37,6 +37,9 @@ namespace OrdvecFormalization
 #check @overlapNull_bayesAdmit_isThreshold
 #check @overlapNull_threshold_bayesRisk_optimal
 #check @overlapNull_threshold_isBayesOptimal
+#check @literal_fnch_overlap_has_mlr
+#check @fnch_overlap_admit_threshold
+#check @fnch_overlap_threshold_bayes_optimal
 #check @toyParams
 #check @balancedPrior
 
@@ -64,5 +67,8 @@ namespace OrdvecFormalization
 #print axioms overlapNull_bayesAdmit_isThreshold
 #print axioms overlapNull_threshold_bayesRisk_optimal
 #print axioms overlapNull_threshold_isBayesOptimal
+#print axioms literal_fnch_overlap_has_mlr
+#print axioms fnch_overlap_admit_threshold
+#print axioms fnch_overlap_threshold_bayes_optimal
 
 end OrdvecFormalization

@@ -20,6 +20,10 @@ in `OrdvecFormalization.ExponentialTilt`, and the feasible FNCH instantiation in
 
 Corpus null calibration and the broader OrdVec overlap interpretation are
 deliberately kept outside this theorem surface.
+
+The citation theorem is `overlapNull_threshold_isBayesOptimal`. The aliases at
+the end of this file keep paper-language names available without duplicating the
+proof spine.
 -/
 
 /-- Paper-facing name for actual-overlap threshold admission sets. -/
@@ -61,5 +65,31 @@ theorem overlapNull_threshold_isBayesOptimal (p : FNCHParams) {θ₀ θ₁ : ℝ
           (overlapAdmissionThresholdSet p cut) ≤
         bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
   overlapNull_threshold_bayesRisk_optimal p hθ prior
+
+/-- Paper-language alias: literal FNCH overlap likelihood ratios are monotone. -/
+theorem literal_fnch_overlap_has_mlr (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) :
+    HasMLR (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) :=
+  overlapNull_fnch_hasMLR p hθ
+
+/-- Paper-language alias: the Bayes admit set is an actual-overlap threshold. -/
+theorem fnch_overlap_admit_threshold (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) (prior : Prior) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
+      bayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior x ↔
+        x ∈ overlapAdmissionThresholdSet p cut :=
+  overlapNull_bayesAdmit_isThreshold p hθ prior
+
+/--
+Paper-language alias: the actual-overlap threshold minimizes finite Bayes risk
+among deterministic admission sets.
+-/
+theorem fnch_overlap_threshold_bayes_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) (prior : Prior) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
+          (overlapAdmissionThresholdSet p cut) ≤
+        bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
+  overlapNull_threshold_isBayesOptimal p hθ prior
 
 end OrdvecFormalization
