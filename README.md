@@ -24,13 +24,20 @@ accept/reject pattern.
 OrdVec candidate generation asks whether an observed overlap count is large
 enough to admit a candidate. This repository proves that, under the finite
 positive-support MLR model used in the OrdVec analysis, the optimal deterministic
-Bayes rule has exactly that shape: accept at or above a threshold and reject below it.
+Bayes rule has exactly that shape: accept at or above a threshold and reject
+below it.
 
 So the formal result supports the structure of the OrdVec popcount cutoff. It is
 not a benchmark, not an implementation proof for the Rust crate, and not a claim
 that every dataset follows the model. Those belong in the main
 [`ordvec`](https://github.com/Fieldnote-Echo/ordvec) repository's tests,
 benchmarks, and empirical validation.
+
+If you are evaluating the crate for a retrieval stack, read this as a
+decision-theoretic sanity check on the shape of the candidate filter. The proof
+says the cutoff form is the right deterministic rule under the model; your
+deployment decision should still use the crate's benchmarks and your own recall,
+latency, and memory measurements.
 
 ## Main Checked Theorem
 
