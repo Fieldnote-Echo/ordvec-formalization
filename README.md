@@ -1,5 +1,7 @@
 # ordvec-formalization
 
+[![Lean CI](https://github.com/Fieldnote-Echo/ordvec-formalization/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/Fieldnote-Echo/ordvec-formalization/actions/workflows/lean_action_ci.yml)
+
 A Lean 4 formalization of the finite monotone-decision theorem behind the
 **OrdVec / RankQuant candidate-generator mechanism**: under positive common
 support and monotone likelihood ratio, the Bayes-optimal deterministic rule is
@@ -149,6 +151,10 @@ make verify
 make audit
 make lint
 ```
+
+The GitHub Actions workflow in
+[`.github/workflows/lean_action_ci.yml`](.github/workflows/lean_action_ci.yml)
+runs the same build, verification, audit, and linter checks.
 
 ## Licensing
 
