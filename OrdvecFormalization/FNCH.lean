@@ -10,6 +10,8 @@ import OrdvecFormalization.ExponentialTilt
 
 open scoped NNReal
 
+namespace OrdvecFormalization
+
 /-!
 # Fisher noncentral hypergeometric feasible support
 
@@ -119,22 +121,27 @@ theorem fnch_hasMLR (p : FNCHParams) {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁)
     HasMLR (fnchPMF p θ₀) (fnchPMF p θ₁) :=
   exponentialTilt_hasMLR (fnchBase p) hθ
 
+/-- Strict-parameter corollary for FNCH PMFs. -/
+theorem fnch_hasMLR_of_lt (p : FNCHParams) {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) :
+    HasMLR (fnchPMF p θ₀) (fnchPMF p θ₁) :=
+  fnch_hasMLR p hθ.le
+
 /-- FNCH Bayes admit sets are thresholds on the feasible support. -/
 theorem fnch_bayesAdmit_isThreshold (p : FNCHParams) {θ₀ θ₁ : ℝ}
-    (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) :
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
-      bayesAdmit (fnchPMF p θ₀) (fnchPMF p θ₁) π x ↔
+      bayesAdmit (fnchPMF p θ₀) (fnchPMF p θ₁) prior x ↔
         x ∈ thresholdSet (p.hi - p.lo) cut :=
-  exponentialTilt_bayesAdmit_isThreshold (fnchBase p) hθ π hπ
+  exponentialTilt_bayesAdmit_isThreshold (fnchBase p) hθ prior
 
 /-- FNCH Bayes risk is minimized by a threshold on the feasible support. -/
 theorem fnch_threshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
-    (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) :
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
-      bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) π
+      bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior
           (thresholdSet (p.hi - p.lo) cut) ≤
-        bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) π R :=
-  exponentialTilt_threshold_bayesRisk_optimal (fnchBase p) hθ π hπ
+        bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior R :=
+  exponentialTilt_threshold_bayesRisk_optimal (fnchBase p) hθ prior
 
 /--
 The threshold set written in actual overlap coordinates.
@@ -162,23 +169,23 @@ theorem actualOverlapThresholdSet_eq_thresholdSet (p : FNCHParams)
 
 /-- FNCH Bayes admit sets are thresholds in actual overlap coordinates. -/
 theorem fnch_bayesAdmit_isActualOverlapThreshold (p : FNCHParams) {θ₀ θ₁ : ℝ}
-    (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) :
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
-      bayesAdmit (fnchPMF p θ₀) (fnchPMF p θ₁) π x ↔
+      bayesAdmit (fnchPMF p θ₀) (fnchPMF p θ₁) prior x ↔
         x ∈ actualOverlapThresholdSet p cut := by
-  rcases fnch_bayesAdmit_isThreshold p hθ π hπ with ⟨cut, hcut⟩
+  rcases fnch_bayesAdmit_isThreshold p hθ prior with ⟨cut, hcut⟩
   refine ⟨cut, ?_⟩
   intro x
   exact (hcut x).trans (mem_actualOverlapThresholdSet_iff p cut x).symm
 
 /-- FNCH Bayes risk is minimized by a threshold in actual overlap coordinates. -/
 theorem fnch_actualOverlapThreshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
-    (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) :
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
-      bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) π
+      bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior
           (actualOverlapThresholdSet p cut) ≤
-        bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) π R := by
-  rcases fnch_threshold_bayesRisk_optimal p hθ π hπ with ⟨cut, hcut⟩
+        bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior R := by
+  rcases fnch_threshold_bayesRisk_optimal p hθ prior with ⟨cut, hcut⟩
   refine ⟨cut, ?_⟩
   intro R
   simpa [actualOverlapThresholdSet_eq_thresholdSet p cut] using hcut R
@@ -267,13 +274,18 @@ theorem fnchActual_hasMLR (p : FNCHParams) {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ 
   intro x y hxy
   simpa [fnchActualPMF_mass_eq_fnchPMF_mass] using fnch_hasMLR p hθ x y hxy
 
+/-- Strict-parameter corollary for literal actual-overlap FNCH PMFs. -/
+theorem fnchActual_hasMLR_of_lt (p : FNCHParams) {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) :
+    HasMLR (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) :=
+  fnchActual_hasMLR p hθ.le
+
 /-- Literal actual-overlap FNCH Bayes admit sets are actual-overlap thresholds. -/
 theorem fnchActual_bayesAdmit_isActualOverlapThreshold (p : FNCHParams) {θ₀ θ₁ : ℝ}
-    (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) :
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
-      bayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) π x ↔
+      bayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior x ↔
         x ∈ actualOverlapThresholdSet p cut := by
-  rcases bayesAdmit_isThreshold (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) π hπ
+  rcases bayesAdmit_isThreshold (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
       (fnchActual_hasMLR p hθ) with ⟨cut, hcut⟩
   refine ⟨cut, ?_⟩
   intro x
@@ -281,13 +293,32 @@ theorem fnchActual_bayesAdmit_isActualOverlapThreshold (p : FNCHParams) {θ₀ �
 
 /-- Literal actual-overlap FNCH Bayes risk is minimized by an actual-overlap threshold. -/
 theorem fnchActual_actualOverlapThreshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
-    (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) :
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
-      bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) π
+      bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
           (actualOverlapThresholdSet p cut) ≤
-        bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) π R := by
-  rcases threshold_bayesRisk_optimal (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) π hπ
+        bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R := by
+  rcases threshold_bayesRisk_optimal (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
       (fnchActual_hasMLR p hθ) with ⟨cut, hcut⟩
   refine ⟨cut, ?_⟩
   intro R
   simpa [actualOverlapThresholdSet_eq_thresholdSet p cut] using hcut R
+
+/-- Strict-parameter Bayes threshold corollary for literal actual-overlap FNCH PMFs. -/
+theorem fnchActual_bayesAdmit_isActualOverlapThreshold_of_lt (p : FNCHParams)
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) (prior : Prior) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
+      bayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior x ↔
+        x ∈ actualOverlapThresholdSet p cut :=
+  fnchActual_bayesAdmit_isActualOverlapThreshold p hθ.le prior
+
+/-- Strict-parameter Bayes-risk optimality corollary for literal actual-overlap FNCH PMFs. -/
+theorem fnchActual_actualOverlapThreshold_bayesRisk_optimal_of_lt (p : FNCHParams)
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) (prior : Prior) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
+          (actualOverlapThresholdSet p cut) ≤
+        bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
+  fnchActual_actualOverlapThreshold_bayesRisk_optimal p hθ.le prior
+
+end OrdvecFormalization

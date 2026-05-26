@@ -8,6 +8,8 @@ import OrdvecFormalization.FiniteDecision
 
 open scoped NNReal
 
+namespace OrdvecFormalization
+
 /-!
 # Monotone likelihood ratio
 
@@ -16,8 +18,8 @@ Bayes admit predicate monotone.
 -/
 
 /-- Bayes admits `H₁` at `x` exactly when the pointwise `H₁` loss is no larger. -/
-def bayesAdmit {n : ℕ} (p0 p1 : PosPMF n) (π : ℝ≥0) (x : Support n) : Prop :=
-  (1 - π) * p0.mass x ≤ π * p1.mass x
+def bayesAdmit {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior) (x : Support n) : Prop :=
+  prior.compl * p0.mass x ≤ prior.prob * p1.mass x
 
 /--
 Cross-multiplication monotone likelihood ratio.
@@ -29,24 +31,26 @@ def HasMLR {n : ℕ} (p0 p1 : PosPMF n) : Prop :=
   ∀ x y : Support n, x ≤ y → p1.mass x * p0.mass y ≤ p1.mass y * p0.mass x
 
 /-- MLR implies that the Bayes admit predicate is monotone on the support. -/
-theorem mlr_monotone_bayesAdmit {n : ℕ} (p0 p1 : PosPMF n) (π : ℝ≥0)
+theorem mlr_monotone_bayesAdmit {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
     (hmlr : HasMLR p0 p1) :
-    Monotone (bayesAdmit p0 p1 π) := by
+    Monotone (bayesAdmit p0 p1 prior) := by
   intro x y hxy hx
   dsimp [bayesAdmit] at hx ⊢
   have hleft :
-      (1 - π) * p0.mass x * p0.mass y ≤ π * p1.mass x * p0.mass y := by
+      prior.compl * p0.mass x * p0.mass y ≤ prior.prob * p1.mass x * p0.mass y := by
     simpa [mul_comm, mul_left_comm, mul_assoc] using
       mul_le_mul_left hx (p0.mass y)
   have hright :
-      π * p1.mass x * p0.mass y ≤ π * p1.mass y * p0.mass x := by
-    simpa [mul_assoc] using mul_le_mul_right (hmlr x y hxy) π
+      prior.prob * p1.mass x * p0.mass y ≤ prior.prob * p1.mass y * p0.mass x := by
+    simpa [mul_assoc] using mul_le_mul_right (hmlr x y hxy) prior.prob
   have hchain :
-      (1 - π) * p0.mass y * p0.mass x ≤ π * p1.mass y * p0.mass x := by
+      prior.compl * p0.mass y * p0.mass x ≤ prior.prob * p1.mass y * p0.mass x := by
     calc
-      (1 - π) * p0.mass y * p0.mass x =
-          (1 - π) * p0.mass x * p0.mass y := by
+      prior.compl * p0.mass y * p0.mass x =
+          prior.compl * p0.mass x * p0.mass y := by
         ac_rfl
-      _ ≤ π * p1.mass x * p0.mass y := hleft
-      _ ≤ π * p1.mass y * p0.mass x := hright
+      _ ≤ prior.prob * p1.mass x * p0.mass y := hleft
+      _ ≤ prior.prob * p1.mass y * p0.mass x := hright
   exact (mul_le_mul_iff_left₀ (p0.pos x)).mp hchain
+
+end OrdvecFormalization

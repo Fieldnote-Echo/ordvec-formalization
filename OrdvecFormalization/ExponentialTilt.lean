@@ -10,6 +10,8 @@ import OrdvecFormalization.BayesThreshold
 
 open scoped NNReal
 
+namespace OrdvecFormalization
+
 /-!
 # Exponential tilts on finite support
 
@@ -109,21 +111,29 @@ theorem exponentialTilt_hasMLR {n : ℕ} (base : PosWeights n) {θ₀ θ₁ : �
     ((tiltNormalizer base θ₁)⁻¹ * (tiltNormalizer base θ₀)⁻¹)
   simpa [exponentialTilt, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hScaled
 
+/-- Strict-parameter corollary for exponential tilts. -/
+theorem exponentialTilt_hasMLR_of_lt {n : ℕ} (base : PosWeights n) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) :
+    HasMLR (exponentialTilt base θ₀) (exponentialTilt base θ₁) :=
+  exponentialTilt_hasMLR base hθ.le
+
 /-- Bayes admit sets for increasing exponential tilts are thresholds. -/
 theorem exponentialTilt_bayesAdmit_isThreshold {n : ℕ} (base : PosWeights n)
-    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) :
     ∃ cut : Fin (n + 2), ∀ x : Support n,
-      bayesAdmit (exponentialTilt base θ₀) (exponentialTilt base θ₁) π x ↔
+      bayesAdmit (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior x ↔
         x ∈ thresholdSet n cut :=
-  bayesAdmit_isThreshold (exponentialTilt base θ₀) (exponentialTilt base θ₁) π hπ
+  bayesAdmit_isThreshold (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior
     (exponentialTilt_hasMLR base hθ)
 
 /-- Bayes risk for increasing exponential tilts is minimized by a threshold rule. -/
 theorem exponentialTilt_threshold_bayesRisk_optimal {n : ℕ} (base : PosWeights n)
-    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) :
     ∃ cut : Fin (n + 2), ∀ R : Set (Support n),
-      bayesRisk (exponentialTilt base θ₀) (exponentialTilt base θ₁) π
+      bayesRisk (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior
           (thresholdSet n cut) ≤
-        bayesRisk (exponentialTilt base θ₀) (exponentialTilt base θ₁) π R :=
-  threshold_bayesRisk_optimal (exponentialTilt base θ₀) (exponentialTilt base θ₁) π hπ
+        bayesRisk (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior R :=
+  threshold_bayesRisk_optimal (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior
     (exponentialTilt_hasMLR base hθ)
+
+end OrdvecFormalization

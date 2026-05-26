@@ -8,6 +8,8 @@ import OrdvecFormalization.FNCH
 
 open scoped NNReal
 
+namespace OrdvecFormalization
+
 /-!
 # Overlap-null theorem surface
 
@@ -25,23 +27,39 @@ def overlapAdmissionThresholdSet :=
   actualOverlapThresholdSet
 
 /-- Paper-facing FNCH MLR theorem. -/
-theorem overlapNull_fnch_hasMLR (p : FNCHParams) {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) :
+theorem overlapNull_fnch_hasMLR (p : FNCHParams) {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) :
     HasMLR (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) :=
-  fnchActual_hasMLR p hθ
+  fnchActual_hasMLR_of_lt p hθ
 
 /-- Paper-facing FNCH Bayes-admit threshold theorem in actual overlap coordinates. -/
 theorem overlapNull_bayesAdmit_isThreshold (p : FNCHParams) {θ₀ θ₁ : ℝ}
-    (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    (hθ : θ₀ < θ₁) (prior : Prior) :
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
-      bayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) π x ↔
+      bayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior x ↔
         x ∈ overlapAdmissionThresholdSet p cut :=
-  fnchActual_bayesAdmit_isActualOverlapThreshold p hθ π hπ
+  fnchActual_bayesAdmit_isActualOverlapThreshold_of_lt p hθ prior
 
 /-- Paper-facing FNCH Bayes-risk optimality theorem in actual overlap coordinates. -/
 theorem overlapNull_threshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
-    (hθ : θ₀ ≤ θ₁) (π : ℝ≥0) (hπ : π ≤ 1) :
+    (hθ : θ₀ < θ₁) (prior : Prior) :
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
-      bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) π
+      bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
           (overlapAdmissionThresholdSet p cut) ≤
-        bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) π R :=
-  fnchActual_actualOverlapThreshold_bayesRisk_optimal p hθ π hπ
+        bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
+  fnchActual_actualOverlapThreshold_bayesRisk_optimal_of_lt p hθ prior
+
+/--
+Paper-facing citation theorem.
+
+For a literal FNCH overlap model with `θ₀ < θ₁`, the Bayes-risk-minimizing
+deterministic admission rule is a threshold in the actual overlap count.
+-/
+theorem overlapNull_threshold_isBayesOptimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) (prior : Prior) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
+          (overlapAdmissionThresholdSet p cut) ≤
+        bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
+  overlapNull_threshold_bayesRisk_optimal p hθ prior
+
+end OrdvecFormalization

@@ -3,7 +3,8 @@
 A Lean 4 formalization of the finite monotone-decision theorem behind the
 **OrdVec / RankQuant candidate-generator mechanism**: under positive common
 support and monotone likelihood ratio, the Bayes-optimal deterministic rule is
-a threshold on the ordered finite statistic.
+a threshold on the ordered finite statistic. All public declarations live in
+the `OrdvecFormalization` namespace.
 
 Seeded from [`takens-formalization`](../takens-formalization) and pinned to the
 same toolchain (Lean `v4.28.0`, Mathlib `v4.28.0`) so lemmas port across without
@@ -18,6 +19,7 @@ a version bump. Sibling to `reccs-/cd-/fd-formalization`.
 > The feasible FNCH support is instantiated as shifted `Fin (hi - lo + 1)` with
 > strictly positive binomial base weights, and the paper-facing overlap-null
 > layer states threshold optimality for literal actual-overlap FNCH weights.
+> Bayes priors are represented by the bundled `Prior` type.
 
 ## What it proves
 
@@ -49,29 +51,40 @@ a version bump. Sibling to `reccs-/cd-/fd-formalization`.
    `choose k x * choose (N-k) (draws-x) * exp(θ*x)` is proved equal pointwise
    to the shifted-coordinate tilt after normalization, so the final theorem
    surface no longer mentions the shifted implementation detail.
+8. **Reviewer-facing theorem shape.**
+   The final citation theorem uses a strict parameter inequality `θ₀ < θ₁`, a
+   bundled `Prior`, and a threshold in actual overlap coordinates:
+   `OrdvecFormalization.overlapNull_threshold_isBayesOptimal`.
 
 The dashboard in [`OrdvecFormalization/Verify.lean`](OrdvecFormalization/Verify.lean)
 checks the theorem names and prints the axiom audit for:
 
 ```lean
+Prior
 mlr_monotone_bayesAdmit
 bayesAdmit_isThreshold
 threshold_bayesRisk_optimal
 exponentialTilt_hasMLR
+exponentialTilt_hasMLR_of_lt
 exponentialTilt_bayesAdmit_isThreshold
 exponentialTilt_threshold_bayesRisk_optimal
 fnch_hasMLR
+fnch_hasMLR_of_lt
 fnch_bayesAdmit_isThreshold
 fnch_threshold_bayesRisk_optimal
 fnch_bayesAdmit_isActualOverlapThreshold
 fnch_actualOverlapThreshold_bayesRisk_optimal
 fnchActualPMF_mass_eq_fnchPMF_mass
 fnchActual_hasMLR
+fnchActual_hasMLR_of_lt
 fnchActual_bayesAdmit_isActualOverlapThreshold
 fnchActual_actualOverlapThreshold_bayesRisk_optimal
+fnchActual_bayesAdmit_isActualOverlapThreshold_of_lt
+fnchActual_actualOverlapThreshold_bayesRisk_optimal_of_lt
 overlapNull_fnch_hasMLR
 overlapNull_bayesAdmit_isThreshold
 overlapNull_threshold_bayesRisk_optimal
+overlapNull_threshold_isBayesOptimal
 ```
 
 Expected axioms are only Lean's standard kernel baseline:
@@ -108,6 +121,7 @@ OrdvecFormalization/
 ├── BayesThreshold.lean
 ├── ExponentialTilt.lean
 ├── FNCH.lean
+├── Examples.lean
 ├── Verify.lean
 └── OverlapNull.lean       # deferred paper-facing overlap layer
 ```
@@ -121,11 +135,11 @@ OrdvecFormalization/
 
 ```sh
 lake update     # fetches Mathlib v4.28.0 (first run; large)
-lake build --wfail
-lake build --wfail OrdvecFormalization.Verify
+make build
+make verify
+make audit
 ```
 
 ## Licensing
 
-Intended dual **MIT OR Apache-2.0**, matching `ordvec`. Add `LICENSE` /
-`LICENSE-APACHE-2.0` before any public release. (Not yet added — local seed.)
+Apache-2.0; see [`LICENSE`](LICENSE).

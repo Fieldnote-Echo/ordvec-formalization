@@ -10,6 +10,8 @@ import Mathlib.Order.UpperLower.Basic
 
 open scoped NNReal
 
+namespace OrdvecFormalization
+
 /-!
 # Finite ordered binary decisions
 
@@ -26,6 +28,23 @@ structure PosPMF (n : ℕ) where
   mass : Support n → ℝ≥0
   pos : ∀ i, 0 < mass i
   sum_one : Finset.univ.sum mass = 1
+
+/-- A prior probability on `H₁`, bundled with the proof that it is at most one. -/
+structure Prior where
+  prob : ℝ≥0
+  le_one : prob ≤ 1
+
+namespace Prior
+
+/-- The prior probability on `H₀`. -/
+def compl (prior : Prior) : ℝ≥0 :=
+  1 - prior.prob
+
+@[simp]
+theorem compl_eq (prior : Prior) : prior.compl = 1 - prior.prob :=
+  rfl
+
+end Prior
 
 /--
 The threshold set associated to a cut.
@@ -65,3 +84,5 @@ theorem exists_threshold_of_monotone_pred (n : ℕ) (P : Support n → Prop)
   refine ⟨cut, ?_⟩
   intro x
   simpa using congrArg (fun t : Set (Support n) => x ∈ t) hcut
+
+end OrdvecFormalization
