@@ -24,7 +24,7 @@ accept/reject pattern.
 OrdVec candidate generation asks whether an observed overlap count is large
 enough to admit a candidate. This repository proves that, under the finite
 positive-support MLR model used in the OrdVec analysis, the optimal deterministic
-Bayes rule has exactly that shape: accept above a threshold and reject below it.
+Bayes rule has exactly that shape: accept at or above a threshold and reject below it.
 
 So the formal result supports the structure of the OrdVec popcount cutoff. It is
 not a benchmark, not an implementation proof for the Rust crate, and not a claim
