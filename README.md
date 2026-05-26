@@ -8,10 +8,13 @@ Seeded from [`takens-formalization`](../takens-formalization) and pinned to the
 same toolchain (Lean `v4.28.0`, Mathlib `v4.28.0`) so lemmas port across without
 a version bump. Sibling to `reccs-/cd-/fd-formalization`.
 
-> **Status: SCAFFOLD.** Statements are drafts (`sorry`-stubbed) in
-> [`OrdvecFormalization/OverlapNull.lean`](OrdvecFormalization/OverlapNull.lean);
-> nothing is built yet. `import Mathlib` is the catch-all import — narrow once the
-> proofs settle.
+> **Status: SCAFFOLD.** The targets are **non-vacuous** `sorry`-stubbed statements —
+> real inequalities over explicit definitions (`OverlapFamily`, `HasMLR`, `power`,
+> `aboveThreshold`, `bayesRisk`), not `True` placeholders — in
+> [`OrdvecFormalization/OverlapNull.lean`](OrdvecFormalization/OverlapNull.lean).
+> **Not yet built** (`lake update && lake build` pending a Mathlib fetch); treat the
+> statements as best-effort drafts to refine against the API. `import Mathlib` is the
+> catch-all import.
 
 ## What it proves (targets)
 
