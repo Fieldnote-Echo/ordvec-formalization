@@ -121,9 +121,9 @@ OrdvecFormalization/
 ├── BayesThreshold.lean
 ├── ExponentialTilt.lean
 ├── FNCH.lean
+├── OverlapNull.lean       # paper-facing theorem surface
 ├── Examples.lean
-├── Verify.lean
-└── OverlapNull.lean       # deferred paper-facing overlap layer
+└── Verify.lean
 ```
 
 ## Future Mathlib / project layers
@@ -138,6 +138,7 @@ lake update     # fetches Mathlib v4.28.0 (first run; large)
 make build
 make verify
 make audit
+make lint
 ```
 
 ## Licensing

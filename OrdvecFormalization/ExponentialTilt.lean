@@ -22,7 +22,9 @@ ratio as `θ` increases.
 
 /-- Positive, not necessarily normalized, base weights on the finite support. -/
 structure PosWeights (n : ℕ) where
+  /-- The unnormalized weight at each support point. -/
   weight : Support n → ℝ≥0
+  /-- Every base weight is strictly positive. -/
   pos : ∀ x, 0 < weight x
 
 /-- The nonnegative real exponential. -/
@@ -83,7 +85,7 @@ theorem nnexp_factor_mlr {n : ℕ} {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁)
     nnexp (θ₁ * x.val) * nnexp (θ₀ * y.val) ≤
       nnexp (θ₁ * y.val) * nnexp (θ₀ * x.val) := by
   have hxyR : (x.val : ℝ) ≤ (y.val : ℝ) := by
-    exact_mod_cast (Fin.le_iff_val_le_val.mp hxy)
+    exact Nat.cast_le.mpr (Fin.le_iff_val_le_val.mp hxy)
   have hprod : 0 ≤ (θ₁ - θ₀) * ((y.val : ℝ) - x.val) :=
     mul_nonneg (sub_nonneg.mpr hθ) (sub_nonneg.mpr hxyR)
   have hlin : θ₁ * (x.val : ℝ) + θ₀ * (y.val : ℝ) ≤

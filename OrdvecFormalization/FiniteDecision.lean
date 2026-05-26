@@ -25,13 +25,18 @@ abbrev Support (n : ℕ) := Fin (n + 1)
 
 /-- A strictly positive probability mass function on the finite support. -/
 structure PosPMF (n : ℕ) where
+  /-- The probability mass at each support point. -/
   mass : Support n → ℝ≥0
+  /-- Every support point has strictly positive mass. -/
   pos : ∀ i, 0 < mass i
+  /-- The mass function is normalized. -/
   sum_one : Finset.univ.sum mass = 1
 
 /-- A prior probability on `H₁`, bundled with the proof that it is at most one. -/
 structure Prior where
+  /-- The prior probability of `H₁`. -/
   prob : ℝ≥0
+  /-- The prior probability is at most one. -/
   le_one : prob ≤ 1
 
 namespace Prior

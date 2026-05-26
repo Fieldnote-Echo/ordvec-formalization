@@ -5,7 +5,6 @@ Authors: Nelson Spence
 -/
 
 import Mathlib.Data.Nat.Choose.Basic
-import Mathlib.Tactic
 import OrdvecFormalization.ExponentialTilt
 
 open scoped NNReal
@@ -26,10 +25,15 @@ point.
 
 /-- Parameters for a feasible overlap problem. -/
 structure FNCHParams where
+  /-- Universe size. -/
   N : ℕ
+  /-- Number of marked items in the universe. -/
   k : ℕ
+  /-- Number of draws. -/
   draws : ℕ
+  /-- The marked count is feasible. -/
   k_le_N : k ≤ N
+  /-- The draw count is feasible. -/
   draws_le_N : draws ≤ N
 
 namespace FNCHParams
@@ -102,9 +106,9 @@ theorem fnchBaseWeight_pos (p : FNCHParams) (x : p.support) :
   have h₂Nat : 0 < (p.N - p.k).choose (p.draws - p.overlap x) :=
     Nat.choose_pos (p.draws_sub_overlap_le_N_sub_k x)
   have h₁ : 0 < (p.k.choose (p.overlap x) : ℝ≥0) := by
-    exact_mod_cast h₁Nat
+    exact (Nat.cast_pos' (α := ℝ≥0)).mpr h₁Nat
   have h₂ : 0 < ((p.N - p.k).choose (p.draws - p.overlap x) : ℝ≥0) := by
-    exact_mod_cast h₂Nat
+    exact (Nat.cast_pos' (α := ℝ≥0)).mpr h₂Nat
   exact mul_pos h₁ h₂
 
 /-- Positive base weights for the feasible FNCH support. -/
@@ -203,9 +207,13 @@ theorem fnchActualWeight_pos (p : FNCHParams) (θ : ℝ) (x : p.support) :
 theorem nnexp_actualOverlap_eq_common_mul (p : FNCHParams) (θ : ℝ) (x : p.support) :
     nnexp (θ * p.overlap x) = nnexp (θ * p.lo) * nnexp (θ * x.val) := by
   have harg : θ * (p.overlap x : ℝ) = θ * (p.lo : ℝ) + θ * (x.val : ℝ) := by
-    unfold FNCHParams.overlap
-    norm_num
-    ring
+    have hoverlap : (p.overlap x : ℝ) = (p.lo : ℝ) + (x.val : ℝ) := by
+      rw [FNCHParams.overlap, Nat.cast_add]
+    calc
+      θ * (p.overlap x : ℝ) = θ * ((p.lo : ℝ) + (x.val : ℝ)) := by
+        rw [hoverlap]
+      _ = θ * (p.lo : ℝ) + θ * (x.val : ℝ) := by
+        rw [mul_add]
   calc
     nnexp (θ * p.overlap x) = nnexp (θ * (p.lo : ℝ) + θ * (x.val : ℝ)) := by
       rw [harg]
