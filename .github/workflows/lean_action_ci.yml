@@ -13,6 +13,7 @@ concurrency:
 
 env:
   ELAN_HOME: /home/runner/.elan
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   # CONTRACT: org ruleset requires this exact check name 'build'
