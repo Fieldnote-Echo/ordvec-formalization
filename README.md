@@ -2,8 +2,49 @@
 
 [![Lean CI](https://github.com/Fieldnote-Echo/ordvec-formalization/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/Fieldnote-Echo/ordvec-formalization/actions/workflows/lean_action_ci.yml)
 
-A Lean 4 formalization of a finite Bayes-threshold theorem for OrdVec-style
-overlap decisions.
+A Lean 4 formalization of finite ordinal retrieval: when relevance evidence
+factors through overlap structure, a popcount-style threshold is Bayes-optimal,
+and under the uniform constant-composition bitmap null its false-positive
+probability is exactly hypergeometric.
+
+The repository is meant to serve two audiences:
+
+- reviewers who want to inspect the precise mathematical claim and its axiom
+  footprint;
+- builders who want to know what would justify an edge-deployable OrdVec/RAG
+  candidate filter rather than another dense matmul stage.
+
+## Checked Headline
+
+Strongest literal-null theorem:
+
+```lean
+OrdvecFormalization.ordvec_bitmap_uniform_null_headline_theorem
+```
+
+In words:
+
+```text
+Under a finite canonical signal model where the null is the uniform law over
+K-active bitmap documents and relevance exponentially tilts that law by
+query-document overlap, literal overlap-tail retrieval is Bayes-optimal among
+all deterministic admission rules.
+
+The same threshold event has exactly the hypergeometric upper-tail probability
+under the model null.
+```
+
+Cost-sensitive version:
+
+```lean
+OrdvecFormalization.ordvec_bitmap_uniform_null_costed_headline_theorem
+```
+
+General positive-base version:
+
+```lean
+OrdvecFormalization.ordvec_bitmap_headline_theorem
+```
 
 ## What This Means
 
@@ -18,6 +59,48 @@ rule is a threshold in the actual overlap count.
 In plain terms: under the modeled monotone-likelihood-ratio condition, the
 formal proof justifies a popcount-style cutoff rule rather than an arbitrary
 accept/reject pattern.
+
+The strongest checked theorem specializes this to the concrete bitmap-document
+setting: the full observation space is the finite type of `K`-active document
+bitmaps, the statistic is literal overlap with a `K`-active query bitmap, and
+the Bayes-optimal pulled-back quotient threshold is exactly the bitmap overlap
+tail event whose null probability is the hypergeometric tail.
+
+## Plain-English Framing
+
+The claim is not that ordinal signatures contain all semantic information in an
+embedding. The claim is task-relative:
+
+```text
+full dense observation Z
+ordinal quotient Q(Z)
+retrieval label Y
+```
+
+If the retrieval evidence satisfies
+
+```text
+P(Y | Z) = P(Y | Q(Z))
+```
+
+or, equivalently in the finite likelihood-ratio form used here, the relevance
+likelihood ratio factors through the quotient, then no Bayes-relevant retrieval
+information is lost by using the quotient. Under the additional monotonicity
+condition, the optimal quotient rule is a threshold on ordinal overlap.
+
+This is a theory of **retrieval sufficiency**, not **representation
+completeness**. Dense magnitudes may still be essential for forming,
+transforming, training, calibrating, and composing semantic representations.
+They can carry margins, near-ties, residual features, confidence, and other
+signals that matter for tasks beyond candidate admission. The formal result
+says only that, for a retrieval decision satisfying the stated statistical
+contract, the decision surface can factor through an order-like quotient.
+
+This is the same broad scientific pattern as rank statistics, AUC, ordinal
+utility, permutation entropy, and other quotient-based methods: full metric
+structure may be needed to generate the state, while a lower-dimensional
+order-like invariant can be enough for a targeted recognition or decision
+problem.
 
 ## Why This Matters For OrdVec Users
 
@@ -39,15 +122,39 @@ says the cutoff form is the right deterministic rule under the model; your
 deployment decision should still use the crate's benchmarks and your own recall,
 latency, and memory measurements.
 
-## Main Checked Theorem
+For an edge RAG component, the practical message is narrow but useful:
+
+- the candidate-admission rule can be a cheap overlap threshold when the
+  relevance evidence is well-modeled by a monotone overlap signal;
+- threshold false-positive behavior has an exact finite null model under the
+  idealized independent constant-composition bitmap law;
+- dense magnitudes remain important upstream for representation formation and
+  downstream for tasks that are not captured by the retrieval label.
+
+## Checked Names
+
+Primary citation theorem:
+
+```lean
+OrdvecFormalization.ordvec_bitmap_uniform_null_headline_theorem
+```
+
+Cost-sensitive primary theorem:
+
+```lean
+OrdvecFormalization.ordvec_bitmap_uniform_null_costed_headline_theorem
+```
+
+General positive-base theorem:
+
+```lean
+OrdvecFormalization.ordvec_bitmap_headline_theorem
+```
+
+Core FNCH overlap theorem:
 
 ```lean
 OrdvecFormalization.overlapNull_threshold_isBayesOptimal
-```
-
-Paper-language alias:
-
-```lean
 OrdvecFormalization.fnch_overlap_threshold_bayes_optimal
 ```
 
@@ -67,9 +174,19 @@ OrdvecFormalization.bitmapUniformPMF_overlapFiber_prob
 OrdvecFormalization.bitmapUniformPMF_overlapTail_prob
 ```
 
-The theorem quantifies over all deterministic admission sets on the feasible
-overlap support and produces a threshold set with Bayes risk no larger than any
-of them.
+Quotient-to-threshold sufficiency bridge:
+
+```lean
+OrdvecFormalization.orderedQuotient_threshold_no_loss_of_orderedEvidenceFactor
+OrdvecFormalization.ordinal_overlap_threshold_bayes_optimal_of_likelihoodRatioFactor
+OrdvecFormalization.canonical_overlap_tilt_threshold_bayes_optimal
+OrdvecFormalization.ordvec_headline_theorem
+OrdvecFormalization.bitmap_doc_tail_bayes_optimal_with_null
+```
+
+The primary theorem quantifies over all deterministic admission sets on the
+finite `K`-active bitmap-document space and produces a literal overlap-tail
+event with Bayes risk no larger than any of them.
 
 The cost-sensitive version also quantifies over false-accept and false-reject
 costs, so asymmetric retrieval tradeoffs do not have to be smuggled into the
@@ -78,8 +195,38 @@ prior.
 The reviewer-facing theorem map is in
 [`docs/theorem-map.md`](docs/theorem-map.md).
 
+A shorter guided read for reviewers and builders is in
+[`docs/reviewer-brief.md`](docs/reviewer-brief.md).
+
 ## Proof Spine
 
+- `FiniteExperiment.lean`: arbitrary finite statistical experiments, quotient
+  pullbacks, and a no-loss theorem when Bayes evidence or the likelihood ratio
+  factors through a quotient. It also includes a toy witness that a quotient can
+  be sufficient for a retrieval target without being representation-complete for
+  a second target.
+- `OrdinalSufficiency.lean`: composes quotient factorization with ordered
+  evidence. If the full likelihood ratio is a monotone function of ordered
+  quotient evidence, then a pulled-back ordinal threshold is Bayes-optimal among
+  all deterministic full-space rules.
+- `OverlapSufficiency.lean`: specializes the quotient bridge to actual overlap
+  coordinates, proving that monotone likelihood-ratio factorization through
+  ordinal overlap evidence yields a Bayes-optimal pulled-back actual-overlap
+  threshold.
+- `CanonicalTilt.lean`: instantiates the factorization contract with a finite
+  exponential family over arbitrary full observations. Tilting a positive base
+  law by quotient-level overlap evidence makes the likelihood ratio a monotone
+  function of that evidence, so the overlap threshold theorem applies.
+- `Headline.lean`: paper-facing theorem names, including
+  `ordvec_headline_theorem`, plus Bayes-prior and cost-sensitive versions of the
+  canonical overlap-tilt result.
+- `BitmapCalibration.lean`: connects the canonical overlap-tilt headline theorem
+  to the exact constant-composition bitmap null. The same produced
+  actual-overlap cutoff is Bayes-optimal under the canonical signal model and
+  has a hypergeometric upper-tail false-positive probability under the uniform
+  `K`-active bitmap null. It also specializes the full observation space to the
+  `K`-active bitmap document subtype and proves the Bayes-optimal pulled-back
+  threshold is exactly the literal bitmap overlap tail event.
 - `FiniteDecision.lean`: monotone predicates on `Fin (n + 1)` are thresholds.
 - `MLR.lean`: cross-multiplication MLR makes weighted Bayes admit predicates
   monotone and connects admission to a likelihood-ratio cutoff.
@@ -103,10 +250,13 @@ Expected axiom baseline:
 ## Scope
 
 This proves an optimality theorem for the admission rule under the stated finite
-model and proves the exact constant-composition bitmap overlap null. It does not
-prove that the textbook hypergeometric is the deployment null for real
-embeddings, and it does not include randomized tests, Neyman-Pearson, UMP,
-Karlin-Rubin, or empirical null calibration.
+model, a quotient no-loss theorem under explicit factorization assumptions, and
+the exact constant-composition bitmap overlap null. It does not prove that real
+encoders satisfy the quotient/factorization contract, it does not prove that the
+textbook hypergeometric is the deployment null for real embeddings, and it does
+not include randomized tests, Neyman-Pearson, UMP, Karlin-Rubin, or empirical
+null calibration. It also does not claim ordinal quotients preserve all useful
+semantic or computational information.
 
 Those are separate layers. This repository is the finite deterministic
 Bayes-threshold layer.

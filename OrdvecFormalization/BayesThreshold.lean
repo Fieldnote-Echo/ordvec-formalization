@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Nelson Spence
 -/
 
+import OrdvecFormalization.FiniteExperiment
 import OrdvecFormalization.MLR
 
 open scoped NNReal
@@ -24,6 +25,16 @@ noncomputable def weightedBayesRisk {n : ℕ} (p0 p1 : PosPMF n) (w0 w1 : ℝ≥
     classical
     exact Finset.univ.sum fun x : Support n =>
       if x ∈ R then w0 * p0.mass x else w1 * p1.mass x
+
+/--
+The ordered-support risk API is the arbitrary finite-law risk API specialized
+to the finite law induced by a positive PMF.
+-/
+theorem weightedBayesRisk_eq_finiteWeightedRisk {n : ℕ} (p0 p1 : PosPMF n)
+    (w0 w1 : ℝ≥0) (R : Set (Support n)) :
+    weightedBayesRisk p0 p1 w0 w1 R =
+      finiteWeightedRisk (finiteLawOfPosPMF p0) (finiteLawOfPosPMF p1) w0 w1 R := by
+  dsimp [weightedBayesRisk, finiteWeightedRisk, finiteLawOfPosPMF]
 
 /-- Finite Bayes risk for an arbitrary deterministic admit set. -/
 noncomputable def bayesRisk {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
@@ -74,20 +85,23 @@ theorem weighted_threshold_bayesRisk_optimal {n : ℕ} (p0 p1 : PosPMF n)
   rcases weightedBayesAdmit_isThreshold p0 p1 w0 w1 hmlr with ⟨cut, hcut⟩
   refine ⟨cut, ?_⟩
   intro R
-  dsimp [weightedBayesRisk]
-  refine Finset.sum_le_sum ?_
-  intro x _hx
-  by_cases hT : x ∈ thresholdSet n cut
-  · have hA : weightedBayesAdmit p0 p1 w0 w1 x := (hcut x).mpr hT
-    by_cases hR : x ∈ R
-    · simp [hT, hR]
-    · simpa [hT, hR, weightedBayesAdmit] using hA
-  · have hA : ¬ weightedBayesAdmit p0 p1 w0 w1 x := fun hx => hT ((hcut x).mp hx)
-    by_cases hR : x ∈ R
-    · have hReject : w1 * p1.mass x ≤ w0 * p0.mass x :=
-        le_of_lt (lt_of_not_ge hA)
-      simpa [hT, hR, weightedBayesAdmit] using hReject
-    · simp [hT, hR]
+  have hset : thresholdSet n cut =
+      finiteWeightedBayesAdmitSet (finiteLawOfPosPMF p0) (finiteLawOfPosPMF p1) w0 w1 := by
+    ext x
+    exact (hcut x).symm
+  calc
+    weightedBayesRisk p0 p1 w0 w1 (thresholdSet n cut)
+        = finiteWeightedRisk (finiteLawOfPosPMF p0) (finiteLawOfPosPMF p1) w0 w1
+            (thresholdSet n cut) :=
+      weightedBayesRisk_eq_finiteWeightedRisk p0 p1 w0 w1 (thresholdSet n cut)
+    _ = finiteWeightedRisk (finiteLawOfPosPMF p0) (finiteLawOfPosPMF p1) w0 w1
+          (finiteWeightedBayesAdmitSet (finiteLawOfPosPMF p0) (finiteLawOfPosPMF p1) w0 w1) := by
+      rw [hset]
+    _ ≤ finiteWeightedRisk (finiteLawOfPosPMF p0) (finiteLawOfPosPMF p1) w0 w1 R :=
+      finiteWeightedBayesAdmitSet_optimal (finiteLawOfPosPMF p0) (finiteLawOfPosPMF p1)
+        w0 w1 R
+    _ = weightedBayesRisk p0 p1 w0 w1 R :=
+      (weightedBayesRisk_eq_finiteWeightedRisk p0 p1 w0 w1 R).symm
 
 /-- The threshold Bayes admit rule minimizes finite Bayes risk. -/
 theorem threshold_bayesRisk_optimal {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
