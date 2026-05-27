@@ -160,10 +160,10 @@ theorem finiteExponentialTilt_likelihoodRatioFactorsThroughOverlapEvidence
 
 /--
 Canonical model theorem: under a finite exponential tilt by ordinal overlap
-evidence, actual-overlap threshold retrieval is Bayes-optimal among all
+evidence, an actual-overlap threshold is Bayes-optimal among all
 deterministic full-space rules.
 -/
-theorem overlapQuotient_threshold_no_loss_of_finiteExponentialTilt
+theorem exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_finiteExponentialTilt
     {Ω Ωq : Type} [Fintype Ω]
     (p : FNCHParams) (base : FiniteLaw Ω) (Q : Ω → Ωq) (O : Ωq → p.support)
     {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (w0 w1 : ℝ≥0) (hw1 : 0 < w1) :
@@ -176,16 +176,14 @@ theorem overlapQuotient_threshold_no_loss_of_finiteExponentialTilt
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₀)
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
           w0 w1 R :=
-  ordinal_overlap_threshold_bayes_optimal_of_likelihoodRatioFactor p Q O
+  exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_likelihoodRatioFactor p Q O
     (finiteExponentialTilt base (fun ω => O (Q ω)) θ₀)
     (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
     w0 w1 hw1
     (finiteExponentialTilt_likelihoodRatioFactorsThroughOverlapEvidence p base Q O hθ)
 
-/--
-Paper-language alias for the canonical finite overlap-tilt model.
--/
-theorem canonical_overlap_tilt_threshold_bayes_optimal
+/-- Convenience wrapper for the canonical finite overlap-tilt model. -/
+theorem exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_canonicalTilt
     {Ω Ωq : Type} [Fintype Ω]
     (p : FNCHParams) (base : FiniteLaw Ω) (Q : Ω → Ωq) (O : Ωq → p.support)
     {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (w0 w1 : ℝ≥0) (hw1 : 0 < w1) :
@@ -198,6 +196,7 @@ theorem canonical_overlap_tilt_threshold_bayes_optimal
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₀)
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
           w0 w1 R :=
-  overlapQuotient_threshold_no_loss_of_finiteExponentialTilt p base Q O hθ w0 w1 hw1
+  exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_finiteExponentialTilt
+    p base Q O hθ w0 w1 hw1
 
 end OrdvecFormalization

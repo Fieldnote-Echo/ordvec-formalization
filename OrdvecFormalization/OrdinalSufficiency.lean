@@ -11,12 +11,12 @@ open scoped NNReal
 namespace OrdvecFormalization
 
 /-!
-# Ordinal sufficiency for retrieval thresholds
+# Ordered quotient sufficiency for threshold decisions
 
-This file composes the quotient no-loss layer with ordered evidence.  If the
+This file composes the quotient optimality layer with ordered evidence. If the
 full likelihood ratio factors through a quotient and then through a monotone
 ordered statistic, the Bayes-optimal full-space rule is a threshold pulled back
-from that ordered ordinal evidence.
+from that ordered evidence.
 -/
 
 /-- Pull an ordered evidence threshold back through an ordinal quotient. -/
@@ -35,10 +35,10 @@ def FiniteLikelihoodRatioFactorsThroughOrderedEvidence {Ω Ωq : Type} [Fintype 
 
 /--
 If the full likelihood ratio is a monotone function of ordered quotient
-evidence, then a pulled-back ordinal threshold is Bayes-optimal among all
-full-space deterministic admit sets.
+evidence, then a pulled-back threshold is Bayes-optimal among all full-space
+deterministic admit sets.
 -/
-theorem orderedQuotient_threshold_no_loss_of_monotone_likelihoodRatioFactor
+theorem exists_orderedQuotientThreshold_finiteWeightedRisk_le_of_monotone
     {Ω Ωq : Type} [Fintype Ω] {n : ℕ}
     (Q : Ω → Ωq) (T : Ωq → Support n)
     (p0 p1 : FiniteLaw Ω) (w0 w1 : ℝ≥0) (hw1 : 0 < w1)
@@ -84,9 +84,9 @@ theorem orderedQuotient_threshold_no_loss_of_monotone_likelihoodRatioFactor
 
 /--
 Bundled version: monotone likelihood-ratio factorization through ordered
-quotient evidence yields a Bayes-optimal ordinal threshold.
+quotient evidence yields a Bayes-optimal threshold.
 -/
-theorem orderedQuotient_threshold_no_loss_of_orderedEvidenceFactor
+theorem exists_orderedQuotientThreshold_finiteWeightedRisk_le_of_orderedEvidenceFactor
     {Ω Ωq : Type} [Fintype Ω] {n : ℕ}
     (Q : Ω → Ωq) (T : Ωq → Support n)
     (p0 p1 : FiniteLaw Ω) (w0 w1 : ℝ≥0) (hw1 : 0 < w1)
@@ -95,7 +95,7 @@ theorem orderedQuotient_threshold_no_loss_of_orderedEvidenceFactor
       finiteWeightedRisk p0 p1 w0 w1 (orderedQuotientThresholdSet Q T cut) ≤
         finiteWeightedRisk p0 p1 w0 w1 R := by
   rcases hfactor with ⟨φ, hmono, hφ⟩
-  exact orderedQuotient_threshold_no_loss_of_monotone_likelihoodRatioFactor
+  exact exists_orderedQuotientThreshold_finiteWeightedRisk_le_of_monotone
     Q T p0 p1 w0 w1 hw1 φ hφ hmono
 
 end OrdvecFormalization

@@ -11,10 +11,10 @@ open scoped NNReal
 namespace OrdvecFormalization
 
 /-!
-# Paper-facing headline theorems
+# Bayes-optimal overlap thresholds
 
 This file packages the quotient, overlap, and canonical tilt layers into theorem
-names that read like the paper claim.  The proofs are intentionally thin: the
+statements about finite Bayes risk.  The proofs are intentionally thin: the
 mathematical work lives in `FiniteExperiment`, `OrdinalSufficiency`,
 `OverlapSufficiency`, and `CanonicalTilt`.
 -/
@@ -31,14 +31,12 @@ noncomputable def finiteCostedBayesRisk {Ω : Type} [Fintype Ω] (p0 p1 : Finite
     (costs.falseReject * prior.prob) R
 
 /--
-Headline theorem, Bayes-prior form.
-
-Under the canonical finite model where relevance tilts a positive full-space
-base law by ordinal overlap evidence, an actual-overlap threshold pulled back
-through the ordinal quotient is Bayes-optimal among all deterministic full-space
-rules.
+Under the canonical finite model where one law is an exponential tilt of a
+positive full-space base law by overlap evidence, an actual-overlap threshold
+pulled back through the quotient is optimal for finite Bayes risk among all
+deterministic full-space rules.
 -/
-theorem ordinal_retrieval_sufficient_for_canonical_overlap_tilt
+theorem exists_overlapQuotientThreshold_finiteBayesRisk_le_of_canonicalTilt
     {Ω Ωq : Type} [Fintype Ω]
     (p : FNCHParams) (base : FiniteLaw Ω) (Q : Ω → Ωq) (O : Ωq → p.support)
     {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) (hprior : 0 < prior.prob) :
@@ -52,10 +50,11 @@ theorem ordinal_retrieval_sufficient_for_canonical_overlap_tilt
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
           prior R := by
   simpa [finiteBayesRisk] using
-    canonical_overlap_tilt_threshold_bayes_optimal p base Q O hθ prior.compl prior.prob hprior
+    exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_canonicalTilt
+      p base Q O hθ prior.compl prior.prob hprior
 
-/-- Strict-signal version of the headline Bayes-prior theorem. -/
-theorem ordinal_retrieval_sufficient_for_canonical_overlap_tilt_of_lt
+/-- Strict-parameter version of the finite Bayes-risk theorem. -/
+theorem exists_overlapQuotientThreshold_finiteBayesRisk_le_of_canonicalTilt_of_lt
     {Ω Ωq : Type} [Fintype Ω]
     (p : FNCHParams) (base : FiniteLaw Ω) (Q : Ω → Ωq) (O : Ωq → p.support)
     {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) (prior : Prior) (hprior : 0 < prior.prob) :
@@ -68,15 +67,14 @@ theorem ordinal_retrieval_sufficient_for_canonical_overlap_tilt_of_lt
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₀)
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
           prior R :=
-  ordinal_retrieval_sufficient_for_canonical_overlap_tilt p base Q O hθ.le prior hprior
+  exists_overlapQuotientThreshold_finiteBayesRisk_le_of_canonicalTilt
+    p base Q O hθ.le prior hprior
 
 /--
-Headline theorem, cost-sensitive form.
-
 Changing priors or asymmetric costs changes only the threshold, not the
 decision-rule form, provided the false-reject side has positive weight.
 -/
-theorem ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed
+theorem exists_overlapQuotientThreshold_finiteCostedBayesRisk_le_of_canonicalTilt
     {Ω Ωq : Type} [Fintype Ω]
     (p : FNCHParams) (base : FiniteLaw Ω) (Q : Ω → Ωq) (O : Ωq → p.support)
     {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts)
@@ -91,11 +89,11 @@ theorem ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
           prior costs R := by
   simpa [finiteCostedBayesRisk] using
-    canonical_overlap_tilt_threshold_bayes_optimal p base Q O hθ
+    exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_canonicalTilt p base Q O hθ
       (costs.falseAccept * prior.compl) (costs.falseReject * prior.prob) hw1
 
-/-- Strict-signal version of the cost-sensitive headline theorem. -/
-theorem ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed_of_lt
+/-- Strict-parameter version of the cost-sensitive theorem. -/
+theorem exists_overlapQuotientThreshold_finiteCostedBayesRisk_le_of_canonicalTilt_of_lt
     {Ω Ωq : Type} [Fintype Ω]
     (p : FNCHParams) (base : FiniteLaw Ω) (Q : Ω → Ωq) (O : Ωq → p.support)
     {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) (prior : Prior) (costs : DecisionCosts)
@@ -109,29 +107,7 @@ theorem ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed_of_lt
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₀)
           (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
           prior costs R :=
-  ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed
+  exists_overlapQuotientThreshold_finiteCostedBayesRisk_le_of_canonicalTilt
     p base Q O hθ.le prior costs hw1
-
-/--
-Paper-language alias for the main conditional claim.
-
-Ordinal overlap evidence is retrieval-sufficient, in the finite Bayes sense,
-under the canonical overlap-tilt model.
--/
-theorem ordvec_headline_theorem
-    {Ω Ωq : Type} [Fintype Ω]
-    (p : FNCHParams) (base : FiniteLaw Ω) (Q : Ω → Ωq) (O : Ωq → p.support)
-    {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) (prior : Prior) (hprior : 0 < prior.prob) :
-    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set Ω,
-      finiteBayesRisk
-          (finiteExponentialTilt base (fun ω => O (Q ω)) θ₀)
-          (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
-          prior (overlapQuotientThresholdSet p Q O cut) ≤
-        finiteBayesRisk
-          (finiteExponentialTilt base (fun ω => O (Q ω)) θ₀)
-          (finiteExponentialTilt base (fun ω => O (Q ω)) θ₁)
-          prior R :=
-  ordinal_retrieval_sufficient_for_canonical_overlap_tilt_of_lt
-    p base Q O hθ prior hprior
 
 end OrdvecFormalization
