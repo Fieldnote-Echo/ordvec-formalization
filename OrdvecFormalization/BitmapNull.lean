@@ -123,6 +123,20 @@ private theorem overlapFiber_card_eq_insideOutsideChoices_card_of_query_card {D 
     {q : Finset (BitmapCoord D)} (hq : q.card = K) :
     (bitmapOverlapFiber D K x q).card = (insideOutsideChoices K x q).card := by
   classical
+  have h_inter : ∀ ab ∈ insideOutsideChoices K x q, q ∩ (ab.1 ∪ ab.2) = ab.1 := by
+    intro ab hab
+    obtain ⟨haq, _hax, hbq, _hbx⟩ := mem_insideOutsideChoices_iff.mp hab
+    ext y
+    constructor
+    · intro hy
+      rcases Finset.mem_inter.mp hy with ⟨hyq, hyu⟩
+      rcases Finset.mem_union.mp hyu with hya | hyb
+      · exact hya
+      · have hynq : y ∉ q := by
+          simpa [bitmapComplement] using hbq hyb
+        exact False.elim (hynq hyq)
+    · intro hya
+      exact Finset.mem_inter.mpr ⟨haq hya, Finset.mem_union_left _ hya⟩
   refine Finset.card_bij'
     (fun d _ => (q ∩ d, d \ q))
     (fun ab _ => ab.1 ∪ ab.2)
@@ -163,18 +177,7 @@ private theorem overlapFiber_card_eq_insideOutsideChoices_card_of_query_card {D 
     have hxK : x ≤ K := by
       rw [← hq, ← hax]
       exact Finset.card_le_card haq
-    have hinter : q ∩ (ab.1 ∪ ab.2) = ab.1 := by
-      ext y
-      constructor
-      · intro hy
-        rcases Finset.mem_inter.mp hy with ⟨hyq, hyu⟩
-        rcases Finset.mem_union.mp hyu with hya | hyb
-        · exact hya
-        · have hynq : y ∉ q := by
-            simpa [bitmapComplement] using hbq hyb
-          exact False.elim (hynq hyq)
-      · intro hya
-        exact Finset.mem_inter.mpr ⟨haq hya, Finset.mem_union_left _ hya⟩
+    have hinter := h_inter ab hab
     constructor
     · change (ab.1 ∪ ab.2).card = K
       omega
@@ -185,17 +188,7 @@ private theorem overlapFiber_card_eq_insideOutsideChoices_card_of_query_card {D 
   · intro ab hab
     obtain ⟨haq, _hax, hbq, _hbx⟩ := mem_insideOutsideChoices_iff.mp hab
     apply Prod.ext
-    · ext y
-      constructor
-      · intro hy
-        rcases Finset.mem_inter.mp hy with ⟨hyq, hyu⟩
-        rcases Finset.mem_union.mp hyu with hya | hyb
-        · exact hya
-        · have hynq : y ∉ q := by
-            simpa [bitmapComplement] using hbq hyb
-          exact False.elim (hynq hyq)
-      · intro hya
-        exact Finset.mem_inter.mpr ⟨haq hya, Finset.mem_union_left _ hya⟩
+    · exact h_inter ab hab
     · ext y
       constructor
       · intro hy

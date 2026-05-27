@@ -74,12 +74,13 @@ noncomputable def likelihoodRatio {n : ℕ} (p0 p1 : PosPMF n) (x : Support n) :
   p1.mass x / p0.mass x
 
 /-- The weighted Bayes cutoff in likelihood-ratio coordinates. -/
-noncomputable def weightedLikelihoodCutoff (w0 w1 : ℝ≥0) : ℝ≥0 :=
+noncomputable def weightedLikelihoodCutoff (w0 w1 : ℝ≥0) (hw1 : 0 < w1) : ℝ≥0 :=
+  have _ : w1 ≠ 0 := ne_of_gt hw1
   w0 / w1
 
 /-- The usual prior-odds cutoff in likelihood-ratio coordinates. -/
-noncomputable def priorOddsCutoff (prior : Prior) : ℝ≥0 :=
-  weightedLikelihoodCutoff prior.compl prior.prob
+noncomputable def priorOddsCutoff (prior : Prior) (hprior : 0 < prior.prob) : ℝ≥0 :=
+  weightedLikelihoodCutoff prior.compl prior.prob hprior
 
 /--
 Weighted Bayes admission is equivalent to exceeding the likelihood-ratio
@@ -88,7 +89,7 @@ cutoff, when the reject-side weight is positive.
 theorem weightedBayesAdmit_iff_cutoff_le_likelihoodRatio {n : ℕ}
     (p0 p1 : PosPMF n) {w0 w1 : ℝ≥0} (hw1 : 0 < w1) (x : Support n) :
     weightedBayesAdmit p0 p1 w0 w1 x ↔
-      weightedLikelihoodCutoff w0 w1 ≤ likelihoodRatio p0 p1 x := by
+      weightedLikelihoodCutoff w0 w1 hw1 ≤ likelihoodRatio p0 p1 x := by
   unfold weightedBayesAdmit weightedLikelihoodCutoff likelihoodRatio
   rw [div_le_div_iff₀ hw1 (p0.pos x)]
   simp [mul_comm]
@@ -99,7 +100,8 @@ cutoff, when the `H₁` prior is positive.
 -/
 theorem bayesAdmit_iff_priorOddsCutoff_le_likelihoodRatio {n : ℕ}
     (p0 p1 : PosPMF n) (prior : Prior) (hprior : 0 < prior.prob) (x : Support n) :
-    bayesAdmit p0 p1 prior x ↔ priorOddsCutoff prior ≤ likelihoodRatio p0 p1 x := by
-  exact weightedBayesAdmit_iff_cutoff_le_likelihoodRatio p0 p1 hprior x
+    bayesAdmit p0 p1 prior x ↔ priorOddsCutoff prior hprior ≤ likelihoodRatio p0 p1 x := by
+  simpa [priorOddsCutoff] using
+    weightedBayesAdmit_iff_cutoff_le_likelihoodRatio p0 p1 hprior x
 
 end OrdvecFormalization

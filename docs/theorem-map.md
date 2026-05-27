@@ -68,8 +68,10 @@ two error types independently.
    pointwise Bayes admit predicate monotone. Positivity of `p0.mass x` is used
    exactly at the final cancellation step. The theorem
    `bayesAdmit_iff_priorOddsCutoff_le_likelihoodRatio` connects the
-   cross-multiplied statement to the usual likelihood-ratio cutoff when the
-   `H1` prior is positive.
+   cross-multiplied statement to the usual likelihood-ratio cutoff. The cutoff
+   constants themselves carry the positive-denominator witness, so degenerate
+   zero-`H1` or zero reject-side weight cases are not given an odds-threshold
+   interpretation by the API.
 
 3. `BayesThreshold.lean`
    `bayesAdmit_isThreshold` turns monotone Bayes admission into a threshold.
