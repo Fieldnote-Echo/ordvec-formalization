@@ -52,6 +52,23 @@ theorem overlapNull_threshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ₁ : 
         bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
   fnchActual_actualOverlapThreshold_bayesRisk_optimal_of_lt p hθ prior
 
+/-- Paper-facing cost-sensitive FNCH Bayes-admit threshold theorem. -/
+theorem overlapNull_costed_bayesAdmit_isThreshold (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
+      costedBayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs x ↔
+        x ∈ overlapAdmissionThresholdSet p cut :=
+  fnchActual_costedBayesAdmit_isActualOverlapThreshold_of_lt p hθ prior costs
+
+/-- Paper-facing cost-sensitive FNCH Bayes-risk optimality theorem. -/
+theorem overlapNull_costed_threshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs
+          (overlapAdmissionThresholdSet p cut) ≤
+        costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs R :=
+  fnchActual_costed_actualOverlapThreshold_bayesRisk_optimal_of_lt p hθ prior costs
+
 /--
 Paper-facing citation theorem.
 
@@ -65,6 +82,21 @@ theorem overlapNull_threshold_isBayesOptimal (p : FNCHParams) {θ₀ θ₁ : ℝ
           (overlapAdmissionThresholdSet p cut) ≤
         bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
   overlapNull_threshold_bayesRisk_optimal p hθ prior
+
+/--
+Paper-facing cost-sensitive citation theorem.
+
+For a literal FNCH overlap model with `θ₀ < θ₁`, the cost-sensitive
+Bayes-risk-minimizing deterministic admission rule is a threshold in the actual
+overlap count.
+-/
+theorem overlapNull_costed_threshold_isBayesOptimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs
+          (overlapAdmissionThresholdSet p cut) ≤
+        costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs R :=
+  overlapNull_costed_threshold_bayesRisk_optimal p hθ prior costs
 
 /-- Paper-language alias: literal FNCH overlap likelihood ratios are monotone. -/
 theorem literal_fnch_overlap_has_mlr (p : FNCHParams) {θ₀ θ₁ : ℝ}
@@ -91,5 +123,17 @@ theorem fnch_overlap_threshold_bayes_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ
           (overlapAdmissionThresholdSet p cut) ≤
         bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
   overlapNull_threshold_isBayesOptimal p hθ prior
+
+/--
+Paper-language alias: the actual-overlap threshold minimizes finite
+cost-sensitive Bayes risk among deterministic admission sets.
+-/
+theorem fnch_overlap_costed_threshold_bayes_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ < θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs
+          (overlapAdmissionThresholdSet p cut) ≤
+        costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs R :=
+  overlapNull_costed_threshold_isBayesOptimal p hθ prior costs
 
 end OrdvecFormalization

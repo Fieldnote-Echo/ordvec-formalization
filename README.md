@@ -51,9 +51,29 @@ Paper-language alias:
 OrdvecFormalization.fnch_overlap_threshold_bayes_optimal
 ```
 
+Cost-sensitive extension:
+
+```lean
+OrdvecFormalization.overlapNull_costed_threshold_isBayesOptimal
+OrdvecFormalization.fnch_overlap_costed_threshold_bayes_optimal
+```
+
+Exact constant-composition bitmap null:
+
+```lean
+OrdvecFormalization.card_bitmapOverlapFiber_of_query_card
+OrdvecFormalization.bitmapFalsePositiveRate_eq_bitmapHypergeomTail_of_query_card
+OrdvecFormalization.bitmapUniformPMF_overlapFiber_prob
+OrdvecFormalization.bitmapUniformPMF_overlapTail_prob
+```
+
 The theorem quantifies over all deterministic admission sets on the feasible
 overlap support and produces a threshold set with Bayes risk no larger than any
 of them.
+
+The cost-sensitive version also quantifies over false-accept and false-reject
+costs, so asymmetric retrieval tradeoffs do not have to be smuggled into the
+prior.
 
 The reviewer-facing theorem map is in
 [`docs/theorem-map.md`](docs/theorem-map.md).
@@ -61,12 +81,17 @@ The reviewer-facing theorem map is in
 ## Proof Spine
 
 - `FiniteDecision.lean`: monotone predicates on `Fin (n + 1)` are thresholds.
-- `MLR.lean`: cross-multiplication MLR makes the Bayes admit predicate monotone.
-- `BayesThreshold.lean`: the Bayes-admit threshold minimizes finite Bayes risk.
+- `MLR.lean`: cross-multiplication MLR makes weighted Bayes admit predicates
+  monotone and connects admission to a likelihood-ratio cutoff.
+- `BayesThreshold.lean`: Bayes and cost-sensitive Bayes thresholds minimize
+  finite pointwise risk.
 - `ExponentialTilt.lean`: positive finite exponential tilts have MLR.
 - `FNCH.lean`: literal actual-overlap FNCH weights match the shifted tilt after
   normalization.
 - `OverlapNull.lean`: paper-facing theorem names.
+- `BitmapNull.lean`: constant-composition bitmap spaces, overlap fibers, and
+  the exact hypergeometric point-mass and upper-tail probability theorem under
+  the uniform finite bitmap law.
 - `Verify.lean`: public-name checks and axiom audit.
 
 Expected axiom baseline:
@@ -78,9 +103,10 @@ Expected axiom baseline:
 ## Scope
 
 This proves an optimality theorem for the admission rule under the stated finite
-model. It does not prove that the textbook hypergeometric is the deployment null
-for real embeddings, and it does not include randomized tests, Neyman-Pearson,
-UMP, Karlin-Rubin, or empirical null calibration.
+model and proves the exact constant-composition bitmap overlap null. It does not
+prove that the textbook hypergeometric is the deployment null for real
+embeddings, and it does not include randomized tests, Neyman-Pearson, UMP,
+Karlin-Rubin, or empirical null calibration.
 
 Those are separate layers. This repository is the finite deterministic
 Bayes-threshold layer.

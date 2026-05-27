@@ -5,6 +5,7 @@ Authors: Nelson Spence
 -/
 
 import OrdvecFormalization.Examples
+import OrdvecFormalization.BitmapNull
 
 namespace OrdvecFormalization
 
@@ -12,63 +13,160 @@ namespace OrdvecFormalization
 # Milestone verification dashboard
 -/
 
+#check @BitmapCoord
+#check @bitmapSpace
+#check @mem_bitmapSpace_iff
+#check @card_bitmapSpace
+#check @bitmapSpace_nonempty
+#check @bitmapOverlap
+#check @bitmapOverlapFiber
+#check @mem_bitmapOverlapFiber_iff
+#check @bitmapOverlapTailEvent
+#check @mem_bitmapOverlapTailEvent_iff
+#check @bitmapComplement
+#check @card_bitmapComplement
+#check @insideOutsideChoices
+#check @mem_insideOutsideChoices_iff
+#check @card_insideOutsideChoices
+#check @bitmapHypergeomNumerator
+#check @card_insideOutsideChoices_of_query_card
+#check @card_bitmapOverlapFiber_of_query_card
+#check @bitmapHypergeomMass
+#check @bitmapHypergeomMass_eq_insideOutsideChoices_card_ratio
+#check @bitmapHypergeomMass_eq_overlapFiber_card_ratio
+#check @bitmapHypergeomTail
+#check @bitmapFalsePositiveRate
+#check @card_bitmapOverlapTailEvent_eq_sum_overlapFiber_card_of_query_card
+#check @bitmapFalsePositiveRate_eq_bitmapHypergeomTail_of_query_card
+#check @bitmapUniformPMF
+#check @bitmapUniformPMF_apply
+#check @bitmapUniformPMF_overlapFiber_prob
+#check @bitmapUniformPMF_overlapTail_prob
 #check @Prior
+#check @DecisionCosts
+#check @weightedBayesAdmit
+#check @costedBayesAdmit
 #check @mlr_monotone_bayesAdmit
+#check @mlr_monotone_weightedBayesAdmit
+#check @likelihoodRatio
+#check @weightedLikelihoodCutoff
+#check @priorOddsCutoff
+#check @weightedBayesAdmit_iff_cutoff_le_likelihoodRatio
+#check @bayesAdmit_iff_priorOddsCutoff_le_likelihoodRatio
+#check @weightedBayesAdmit_isThreshold
 #check @bayesAdmit_isThreshold
+#check @costedBayesAdmit_isThreshold
+#check @weightedBayesRisk
 #check @threshold_bayesRisk_optimal
+#check @weighted_threshold_bayesRisk_optimal
+#check @costedBayesRisk
+#check @costed_threshold_bayesRisk_optimal
 #check @exponentialTilt_hasMLR
 #check @exponentialTilt_hasMLR_of_lt
 #check @exponentialTilt_bayesAdmit_isThreshold
 #check @exponentialTilt_threshold_bayesRisk_optimal
+#check @exponentialTilt_costedBayesAdmit_isThreshold
+#check @exponentialTilt_costed_threshold_bayesRisk_optimal
 #check @fnch_hasMLR
 #check @fnch_hasMLR_of_lt
 #check @fnch_bayesAdmit_isThreshold
 #check @fnch_threshold_bayesRisk_optimal
+#check @fnch_costedBayesAdmit_isThreshold
+#check @fnch_costed_threshold_bayesRisk_optimal
 #check @fnch_bayesAdmit_isActualOverlapThreshold
 #check @fnch_actualOverlapThreshold_bayesRisk_optimal
+#check @fnch_costedBayesAdmit_isActualOverlapThreshold
+#check @fnch_costed_actualOverlapThreshold_bayesRisk_optimal
 #check @fnchActualPMF_mass_eq_fnchPMF_mass
 #check @fnchActual_hasMLR
 #check @fnchActual_hasMLR_of_lt
 #check @fnchActual_bayesAdmit_isActualOverlapThreshold
 #check @fnchActual_actualOverlapThreshold_bayesRisk_optimal
+#check @fnchActual_costedBayesAdmit_isActualOverlapThreshold
+#check @fnchActual_costed_actualOverlapThreshold_bayesRisk_optimal
 #check @fnchActual_bayesAdmit_isActualOverlapThreshold_of_lt
 #check @fnchActual_actualOverlapThreshold_bayesRisk_optimal_of_lt
+#check @fnchActual_costedBayesAdmit_isActualOverlapThreshold_of_lt
+#check @fnchActual_costed_actualOverlapThreshold_bayesRisk_optimal_of_lt
 #check @overlapNull_fnch_hasMLR
 #check @overlapNull_bayesAdmit_isThreshold
 #check @overlapNull_threshold_bayesRisk_optimal
 #check @overlapNull_threshold_isBayesOptimal
+#check @overlapNull_costed_bayesAdmit_isThreshold
+#check @overlapNull_costed_threshold_bayesRisk_optimal
+#check @overlapNull_costed_threshold_isBayesOptimal
 #check @literal_fnch_overlap_has_mlr
 #check @fnch_overlap_admit_threshold
 #check @fnch_overlap_threshold_bayes_optimal
+#check @fnch_overlap_costed_threshold_bayes_optimal
 #check @toyParams
 #check @balancedPrior
+#check @unitDecisionCosts
 
+#print axioms mem_bitmapSpace_iff
+#print axioms card_bitmapSpace
+#print axioms bitmapSpace_nonempty
+#print axioms mem_bitmapOverlapFiber_iff
+#print axioms mem_bitmapOverlapTailEvent_iff
+#print axioms card_bitmapComplement
+#print axioms mem_insideOutsideChoices_iff
+#print axioms card_insideOutsideChoices
+#print axioms card_insideOutsideChoices_of_query_card
+#print axioms card_bitmapOverlapFiber_of_query_card
+#print axioms bitmapHypergeomMass_eq_insideOutsideChoices_card_ratio
+#print axioms bitmapHypergeomMass_eq_overlapFiber_card_ratio
+#print axioms card_bitmapOverlapTailEvent_eq_sum_overlapFiber_card_of_query_card
+#print axioms bitmapFalsePositiveRate_eq_bitmapHypergeomTail_of_query_card
+#print axioms bitmapUniformPMF_apply
+#print axioms bitmapUniformPMF_overlapFiber_prob
+#print axioms bitmapUniformPMF_overlapTail_prob
 #print axioms mlr_monotone_bayesAdmit
+#print axioms mlr_monotone_weightedBayesAdmit
+#print axioms weightedBayesAdmit_iff_cutoff_le_likelihoodRatio
+#print axioms bayesAdmit_iff_priorOddsCutoff_le_likelihoodRatio
+#print axioms weightedBayesAdmit_isThreshold
 #print axioms bayesAdmit_isThreshold
+#print axioms costedBayesAdmit_isThreshold
 #print axioms threshold_bayesRisk_optimal
+#print axioms weighted_threshold_bayesRisk_optimal
+#print axioms costed_threshold_bayesRisk_optimal
 #print axioms exponentialTilt_hasMLR
 #print axioms exponentialTilt_hasMLR_of_lt
 #print axioms exponentialTilt_bayesAdmit_isThreshold
 #print axioms exponentialTilt_threshold_bayesRisk_optimal
+#print axioms exponentialTilt_costedBayesAdmit_isThreshold
+#print axioms exponentialTilt_costed_threshold_bayesRisk_optimal
 #print axioms fnch_hasMLR
 #print axioms fnch_hasMLR_of_lt
 #print axioms fnch_bayesAdmit_isThreshold
 #print axioms fnch_threshold_bayesRisk_optimal
+#print axioms fnch_costedBayesAdmit_isThreshold
+#print axioms fnch_costed_threshold_bayesRisk_optimal
 #print axioms fnch_bayesAdmit_isActualOverlapThreshold
 #print axioms fnch_actualOverlapThreshold_bayesRisk_optimal
+#print axioms fnch_costedBayesAdmit_isActualOverlapThreshold
+#print axioms fnch_costed_actualOverlapThreshold_bayesRisk_optimal
 #print axioms fnchActualPMF_mass_eq_fnchPMF_mass
 #print axioms fnchActual_hasMLR
 #print axioms fnchActual_hasMLR_of_lt
 #print axioms fnchActual_bayesAdmit_isActualOverlapThreshold
 #print axioms fnchActual_actualOverlapThreshold_bayesRisk_optimal
+#print axioms fnchActual_costedBayesAdmit_isActualOverlapThreshold
+#print axioms fnchActual_costed_actualOverlapThreshold_bayesRisk_optimal
 #print axioms fnchActual_bayesAdmit_isActualOverlapThreshold_of_lt
 #print axioms fnchActual_actualOverlapThreshold_bayesRisk_optimal_of_lt
+#print axioms fnchActual_costedBayesAdmit_isActualOverlapThreshold_of_lt
+#print axioms fnchActual_costed_actualOverlapThreshold_bayesRisk_optimal_of_lt
 #print axioms overlapNull_fnch_hasMLR
 #print axioms overlapNull_bayesAdmit_isThreshold
 #print axioms overlapNull_threshold_bayesRisk_optimal
 #print axioms overlapNull_threshold_isBayesOptimal
+#print axioms overlapNull_costed_bayesAdmit_isThreshold
+#print axioms overlapNull_costed_threshold_bayesRisk_optimal
+#print axioms overlapNull_costed_threshold_isBayesOptimal
 #print axioms literal_fnch_overlap_has_mlr
 #print axioms fnch_overlap_admit_threshold
 #print axioms fnch_overlap_threshold_bayes_optimal
+#print axioms fnch_overlap_costed_threshold_bayes_optimal
 
 end OrdvecFormalization

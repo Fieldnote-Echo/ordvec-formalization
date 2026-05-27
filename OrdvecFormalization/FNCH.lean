@@ -147,6 +147,23 @@ theorem fnch_threshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
         bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior R :=
   exponentialTilt_threshold_bayesRisk_optimal (fnchBase p) hθ prior
 
+/-- Cost-sensitive FNCH Bayes admit sets are thresholds on the feasible support. -/
+theorem fnch_costedBayesAdmit_isThreshold (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
+      costedBayesAdmit (fnchPMF p θ₀) (fnchPMF p θ₁) prior costs x ↔
+        x ∈ thresholdSet (p.hi - p.lo) cut :=
+  exponentialTilt_costedBayesAdmit_isThreshold (fnchBase p) hθ prior costs
+
+/-- Cost-sensitive FNCH Bayes risk is minimized by a threshold on the feasible support. -/
+theorem fnch_costed_threshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      costedBayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior costs
+          (thresholdSet (p.hi - p.lo) cut) ≤
+        costedBayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior costs R :=
+  exponentialTilt_costed_threshold_bayesRisk_optimal (fnchBase p) hθ prior costs
+
 /--
 The threshold set written in actual overlap coordinates.
 
@@ -190,6 +207,29 @@ theorem fnch_actualOverlapThreshold_bayesRisk_optimal (p : FNCHParams) {θ₀ θ
           (actualOverlapThresholdSet p cut) ≤
         bayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior R := by
   rcases fnch_threshold_bayesRisk_optimal p hθ prior with ⟨cut, hcut⟩
+  refine ⟨cut, ?_⟩
+  intro R
+  simpa [actualOverlapThresholdSet_eq_thresholdSet p cut] using hcut R
+
+/-- Cost-sensitive FNCH Bayes admit sets are thresholds in actual overlap coordinates. -/
+theorem fnch_costedBayesAdmit_isActualOverlapThreshold (p : FNCHParams) {θ₀ θ₁ : ℝ}
+    (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
+      costedBayesAdmit (fnchPMF p θ₀) (fnchPMF p θ₁) prior costs x ↔
+        x ∈ actualOverlapThresholdSet p cut := by
+  rcases fnch_costedBayesAdmit_isThreshold p hθ prior costs with ⟨cut, hcut⟩
+  refine ⟨cut, ?_⟩
+  intro x
+  exact (hcut x).trans (mem_actualOverlapThresholdSet_iff p cut x).symm
+
+/-- Cost-sensitive FNCH Bayes risk is minimized by an actual-overlap threshold. -/
+theorem fnch_costed_actualOverlapThreshold_bayesRisk_optimal (p : FNCHParams)
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      costedBayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior costs
+          (actualOverlapThresholdSet p cut) ≤
+        costedBayesRisk (fnchPMF p θ₀) (fnchPMF p θ₁) prior costs R := by
+  rcases fnch_costed_threshold_bayesRisk_optimal p hθ prior costs with ⟨cut, hcut⟩
   refine ⟨cut, ?_⟩
   intro R
   simpa [actualOverlapThresholdSet_eq_thresholdSet p cut] using hcut R
@@ -312,6 +352,31 @@ theorem fnchActual_actualOverlapThreshold_bayesRisk_optimal (p : FNCHParams) {θ
   intro R
   simpa [actualOverlapThresholdSet_eq_thresholdSet p cut] using hcut R
 
+/-- Literal actual-overlap FNCH cost-sensitive Bayes admit sets are actual-overlap thresholds. -/
+theorem fnchActual_costedBayesAdmit_isActualOverlapThreshold (p : FNCHParams)
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
+      costedBayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs x ↔
+        x ∈ actualOverlapThresholdSet p cut := by
+  rcases costedBayesAdmit_isThreshold (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
+      costs (fnchActual_hasMLR p hθ) with ⟨cut, hcut⟩
+  refine ⟨cut, ?_⟩
+  intro x
+  exact (hcut x).trans (mem_actualOverlapThresholdSet_iff p cut x).symm
+
+/-- Literal actual-overlap FNCH cost-sensitive Bayes risk is minimized by a threshold. -/
+theorem fnchActual_costed_actualOverlapThreshold_bayesRisk_optimal (p : FNCHParams)
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs
+          (actualOverlapThresholdSet p cut) ≤
+        costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs R := by
+  rcases costed_threshold_bayesRisk_optimal (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior
+      costs (fnchActual_hasMLR p hθ) with ⟨cut, hcut⟩
+  refine ⟨cut, ?_⟩
+  intro R
+  simpa [actualOverlapThresholdSet_eq_thresholdSet p cut] using hcut R
+
 /-- Strict-parameter Bayes threshold corollary for literal actual-overlap FNCH PMFs. -/
 theorem fnchActual_bayesAdmit_isActualOverlapThreshold_of_lt (p : FNCHParams)
     {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) (prior : Prior) :
@@ -328,5 +393,23 @@ theorem fnchActual_actualOverlapThreshold_bayesRisk_optimal_of_lt (p : FNCHParam
           (actualOverlapThresholdSet p cut) ≤
         bayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior R :=
   fnchActual_actualOverlapThreshold_bayesRisk_optimal p hθ.le prior
+
+/-- Strict-parameter cost-sensitive threshold corollary for literal actual-overlap FNCH PMFs. -/
+theorem fnchActual_costedBayesAdmit_isActualOverlapThreshold_of_lt (p : FNCHParams)
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ x : p.support,
+      costedBayesAdmit (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs x ↔
+        x ∈ actualOverlapThresholdSet p cut :=
+  fnchActual_costedBayesAdmit_isActualOverlapThreshold p hθ.le prior costs
+
+/-- Strict-parameter cost-sensitive Bayes-risk corollary for literal actual-overlap FNCH PMFs. -/
+theorem fnchActual_costed_actualOverlapThreshold_bayesRisk_optimal_of_lt
+    (p : FNCHParams) {θ₀ θ₁ : ℝ} (hθ : θ₀ < θ₁) (prior : Prior)
+    (costs : DecisionCosts) :
+    ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set p.support,
+      costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs
+          (actualOverlapThresholdSet p cut) ≤
+        costedBayesRisk (fnchActualPMF p θ₀) (fnchActualPMF p θ₁) prior costs R :=
+  fnchActual_costed_actualOverlapThreshold_bayesRisk_optimal p hθ.le prior costs
 
 end OrdvecFormalization

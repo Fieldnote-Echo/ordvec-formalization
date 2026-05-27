@@ -39,6 +39,18 @@ structure Prior where
   /-- The prior probability is at most one. -/
   le_one : prob ≤ 1
 
+/--
+False-decision costs for deterministic binary admission rules.
+
+`falseAccept` is paid when the rule admits under `H₀`; `falseReject` is paid
+when the rule rejects under `H₁`.
+-/
+structure DecisionCosts where
+  /-- Cost of admitting a false candidate under `H₀`. -/
+  falseAccept : ℝ≥0
+  /-- Cost of rejecting a true candidate under `H₁`. -/
+  falseReject : ℝ≥0
+
 namespace Prior
 
 /-- The prior probability on `H₀`. -/
