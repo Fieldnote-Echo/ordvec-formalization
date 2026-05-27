@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Nelson Spence
 -/
 
+import OrdvecFormalization.FiniteExperiment
 import OrdvecFormalization.MLR
 
 open scoped NNReal
@@ -74,20 +75,19 @@ theorem weighted_threshold_bayesRisk_optimal {n : ℕ} (p0 p1 : PosPMF n)
   rcases weightedBayesAdmit_isThreshold p0 p1 w0 w1 hmlr with ⟨cut, hcut⟩
   refine ⟨cut, ?_⟩
   intro R
-  dsimp [weightedBayesRisk]
-  refine Finset.sum_le_sum ?_
-  intro x _hx
-  by_cases hT : x ∈ thresholdSet n cut
-  · have hA : weightedBayesAdmit p0 p1 w0 w1 x := (hcut x).mpr hT
-    by_cases hR : x ∈ R
-    · simp [hT, hR]
-    · simpa [hT, hR, weightedBayesAdmit] using hA
-  · have hA : ¬ weightedBayesAdmit p0 p1 w0 w1 x := fun hx => hT ((hcut x).mp hx)
-    by_cases hR : x ∈ R
-    · have hReject : w1 * p1.mass x ≤ w0 * p0.mass x :=
-        le_of_lt (lt_of_not_ge hA)
-      simpa [hT, hR, weightedBayesAdmit] using hReject
-    · simp [hT, hR]
+  let q0 := finiteLawOfPosPMF p0
+  let q1 := finiteLawOfPosPMF p1
+  have hset : thresholdSet n cut = finiteWeightedBayesAdmitSet q0 q1 w0 w1 := by
+    ext x
+    exact (hcut x).symm
+  calc
+    weightedBayesRisk p0 p1 w0 w1 (thresholdSet n cut)
+        = finiteWeightedRisk q0 q1 w0 w1 (thresholdSet n cut) := rfl
+    _ = finiteWeightedRisk q0 q1 w0 w1 (finiteWeightedBayesAdmitSet q0 q1 w0 w1) := by
+      rw [hset]
+    _ ≤ finiteWeightedRisk q0 q1 w0 w1 R :=
+      finiteWeightedBayesAdmitSet_optimal q0 q1 w0 w1 R
+    _ = weightedBayesRisk p0 p1 w0 w1 R := rfl
 
 /-- The threshold Bayes admit rule minimizes finite Bayes risk. -/
 theorem threshold_bayesRisk_optimal {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)

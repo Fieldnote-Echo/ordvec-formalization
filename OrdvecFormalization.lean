@@ -1,3 +1,9 @@
 -- OrdvecFormalization — root module.
+import OrdvecFormalization.FiniteExperiment
+import OrdvecFormalization.OrdinalSufficiency
+import OrdvecFormalization.OverlapSufficiency
+import OrdvecFormalization.CanonicalTilt
+import OrdvecFormalization.Headline
+import OrdvecFormalization.BitmapCalibration
 import OrdvecFormalization.BitmapNull
 import OrdvecFormalization.OverlapNull

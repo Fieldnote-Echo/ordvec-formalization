@@ -35,6 +35,11 @@ noncomputable def nnexp (r : ℝ) : ℝ≥0 :=
 theorem coe_nnexp (r : ℝ) : (nnexp r : ℝ) = Real.exp r :=
   rfl
 
+@[simp]
+theorem nnexp_zero : nnexp 0 = 1 := by
+  apply NNReal.coe_injective
+  simp [nnexp]
+
 /-- `nnexp` is strictly positive. -/
 theorem nnexp_pos (r : ℝ) : 0 < nnexp r := by
   change (0 : ℝ) < Real.exp r

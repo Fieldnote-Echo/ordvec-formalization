@@ -6,6 +6,12 @@ Authors: Nelson Spence
 
 import OrdvecFormalization.Examples
 import OrdvecFormalization.BitmapNull
+import OrdvecFormalization.FiniteExperiment
+import OrdvecFormalization.OrdinalSufficiency
+import OrdvecFormalization.OverlapSufficiency
+import OrdvecFormalization.CanonicalTilt
+import OrdvecFormalization.Headline
+import OrdvecFormalization.BitmapCalibration
 
 namespace OrdvecFormalization
 
@@ -42,6 +48,86 @@ namespace OrdvecFormalization
 #check @bitmapUniformPMF_apply
 #check @bitmapUniformPMF_overlapFiber_prob
 #check @bitmapUniformPMF_overlapTail_prob
+#check @FiniteLaw
+#check @finiteLawOfPosPMF
+#check @finiteWeightedBayesAdmit
+#check @finiteWeightedBayesAdmitSet
+#check @finiteWeightedRisk
+#check @finiteLawProb
+#check @finiteWeightedBayesAdmitSet_optimal
+#check @quotientPullback
+#check @RuleFactorsThrough
+#check @RulePredicts
+#check @mem_quotientPullback_of_quotient_preserving
+#check @FiniteBayesAdmitFactorsThrough
+#check @quotientBayesAdmitSet
+#check @quotientBayesAdmitSet_pullback_eq
+#check @quotient_bayes_no_loss
+#check @finiteLikelihoodRatio
+#check @FiniteLikelihoodRatioFactorsThrough
+#check @finiteWeightedBayesAdmit_iff_cutoff_le_likelihoodRatio
+#check @finiteBayesAdmitFactorsThrough_of_likelihoodRatioFactorsThrough
+#check @quotient_bayes_no_loss_of_likelihoodRatioFactorsThrough
+#check @orderedQuotientThresholdSet
+#check @FiniteLikelihoodRatioFactorsThroughOrderedEvidence
+#check @orderedQuotient_threshold_no_loss_of_monotone_likelihoodRatioFactor
+#check @orderedQuotient_threshold_no_loss_of_orderedEvidenceFactor
+#check @overlapQuotientThresholdSet
+#check @overlapQuotientThresholdSet_eq_orderedQuotientThresholdSet
+#check @FiniteLikelihoodRatioFactorsThroughOverlapEvidence
+#check @overlapQuotient_threshold_no_loss_of_overlapEvidenceFactor
+#check @ordinal_overlap_threshold_bayes_optimal_of_likelihoodRatioFactor
+#check @finiteTiltWeight
+#check @finiteTiltNormalizer
+#check @finiteExponentialTilt
+#check @finiteTiltWeight_zero
+#check @finiteTiltNormalizer_zero
+#check @finiteExponentialTilt_zero_mass
+#check @finiteExponentialTiltLikelihoodFactor
+#check @finiteLikelihoodRatio_finiteExponentialTilt_eq_factor
+#check @nnexp_ratio_monotone
+#check @finiteExponentialTiltLikelihoodFactor_monotone
+#check @finiteExponentialTilt_likelihoodRatioFactorsThroughOrderedEvidence
+#check @finiteExponentialTilt_likelihoodRatioFactorsThroughOverlapEvidence
+#check @overlapQuotient_threshold_no_loss_of_finiteExponentialTilt
+#check @canonical_overlap_tilt_threshold_bayes_optimal
+#check @finiteBayesRisk
+#check @finiteCostedBayesRisk
+#check @ordinal_retrieval_sufficient_for_canonical_overlap_tilt
+#check @ordinal_retrieval_sufficient_for_canonical_overlap_tilt_of_lt
+#check @ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed
+#check @ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed_of_lt
+#check @ordvec_headline_theorem
+#check @bitmapFNCHParams
+#check @bitmapOverlapParams
+#check @BitmapCut
+#check @bitmapCutThreshold
+#check @BitmapDoc
+#check @bitmapDoc_card
+#check @bitmapDocUniformLaw
+#check @bitmapDocOverlapTailSet
+#check @bitmapFNCHParams_lo_le_overlap
+#check @bitmapOverlap_le_bitmapFNCHParams_hi
+#check @bitmapDocOverlapEvidence
+#check @bitmapDocOverlapEvidence_overlap
+#check @overlapQuotientThresholdSet_bitmapDocOverlapEvidence_eq
+#check @ordvec_headline_theorem_with_bitmap_null
+#check @ordvec_headline_costed_theorem_with_bitmap_null
+#check @bitmap_doc_tail_bayes_optimal_with_null
+#check @bitmap_doc_tail_costed_bayes_optimal_with_null
+#check @ordvec_bitmap_headline_theorem
+#check @ordvec_bitmap_costed_headline_theorem
+#check @ordvec_bitmap_uniform_null_headline_theorem
+#check @ordvec_bitmap_uniform_null_costed_headline_theorem
+#check @DenseToyObs
+#check @denseToyQuotient
+#check @denseToyRetrievalTarget
+#check @denseToyTransformationTarget
+#check @denseToy_retrievalTarget_factorsThrough
+#check @denseToy_retrievalTarget_predictable_by_quotient
+#check @denseToy_transformationTarget_predictable_by_full_observation
+#check @denseToy_transformationTarget_not_factorsThrough
+#check @denseToy_retrieval_sufficient_not_representation_complete
 #check @Prior
 #check @DecisionCosts
 #check @weightedBayesAdmit
@@ -101,7 +187,9 @@ namespace OrdvecFormalization
 #check @fnch_overlap_costed_threshold_bayes_optimal
 #check @toyParams
 #check @balancedPrior
+#check @balancedPrior_pos
 #check @unitDecisionCosts
+#check @unitDecisionCosts_falseReject_mul_balancedPrior_pos
 
 #print axioms mem_bitmapSpace_iff
 #print axioms card_bitmapSpace
@@ -120,6 +208,58 @@ namespace OrdvecFormalization
 #print axioms bitmapUniformPMF_apply
 #print axioms bitmapUniformPMF_overlapFiber_prob
 #print axioms bitmapUniformPMF_overlapTail_prob
+#print axioms finiteWeightedBayesAdmitSet_optimal
+#print axioms finiteLawProb
+#print axioms mem_quotientPullback_of_quotient_preserving
+#print axioms quotientBayesAdmitSet_pullback_eq
+#print axioms quotient_bayes_no_loss
+#print axioms finiteWeightedBayesAdmit_iff_cutoff_le_likelihoodRatio
+#print axioms finiteBayesAdmitFactorsThrough_of_likelihoodRatioFactorsThrough
+#print axioms quotient_bayes_no_loss_of_likelihoodRatioFactorsThrough
+#print axioms orderedQuotient_threshold_no_loss_of_monotone_likelihoodRatioFactor
+#print axioms orderedQuotient_threshold_no_loss_of_orderedEvidenceFactor
+#print axioms overlapQuotientThresholdSet_eq_orderedQuotientThresholdSet
+#print axioms overlapQuotient_threshold_no_loss_of_overlapEvidenceFactor
+#print axioms ordinal_overlap_threshold_bayes_optimal_of_likelihoodRatioFactor
+#print axioms finiteLikelihoodRatio_finiteExponentialTilt_eq_factor
+#print axioms finiteTiltWeight_zero
+#print axioms finiteTiltNormalizer_zero
+#print axioms finiteExponentialTilt_zero_mass
+#print axioms nnexp_ratio_monotone
+#print axioms finiteExponentialTiltLikelihoodFactor_monotone
+#print axioms finiteExponentialTilt_likelihoodRatioFactorsThroughOrderedEvidence
+#print axioms finiteExponentialTilt_likelihoodRatioFactorsThroughOverlapEvidence
+#print axioms overlapQuotient_threshold_no_loss_of_finiteExponentialTilt
+#print axioms canonical_overlap_tilt_threshold_bayes_optimal
+#print axioms ordinal_retrieval_sufficient_for_canonical_overlap_tilt
+#print axioms ordinal_retrieval_sufficient_for_canonical_overlap_tilt_of_lt
+#print axioms ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed
+#print axioms ordinal_retrieval_sufficient_for_canonical_overlap_tilt_costed_of_lt
+#print axioms ordvec_headline_theorem
+#print axioms bitmapFNCHParams
+#print axioms bitmapOverlapParams
+#print axioms bitmapCutThreshold
+#print axioms bitmapDoc_card
+#print axioms bitmapDocUniformLaw
+#print axioms bitmapDocOverlapTailSet
+#print axioms bitmapFNCHParams_lo_le_overlap
+#print axioms bitmapOverlap_le_bitmapFNCHParams_hi
+#print axioms bitmapDocOverlapEvidence
+#print axioms bitmapDocOverlapEvidence_overlap
+#print axioms overlapQuotientThresholdSet_bitmapDocOverlapEvidence_eq
+#print axioms ordvec_headline_theorem_with_bitmap_null
+#print axioms ordvec_headline_costed_theorem_with_bitmap_null
+#print axioms bitmap_doc_tail_bayes_optimal_with_null
+#print axioms bitmap_doc_tail_costed_bayes_optimal_with_null
+#print axioms ordvec_bitmap_headline_theorem
+#print axioms ordvec_bitmap_costed_headline_theorem
+#print axioms ordvec_bitmap_uniform_null_headline_theorem
+#print axioms ordvec_bitmap_uniform_null_costed_headline_theorem
+#print axioms denseToy_retrievalTarget_factorsThrough
+#print axioms denseToy_retrievalTarget_predictable_by_quotient
+#print axioms denseToy_transformationTarget_predictable_by_full_observation
+#print axioms denseToy_transformationTarget_not_factorsThrough
+#print axioms denseToy_retrieval_sufficient_not_representation_complete
 #print axioms mlr_monotone_bayesAdmit
 #print axioms mlr_monotone_weightedBayesAdmit
 #print axioms weightedBayesAdmit_iff_cutoff_le_likelihoodRatio
