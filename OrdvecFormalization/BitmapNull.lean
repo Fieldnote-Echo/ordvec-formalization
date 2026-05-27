@@ -15,13 +15,13 @@ open scoped NNReal ENNReal
 namespace OrdvecFormalization
 
 /-!
-# Constant-composition bitmap null
+# Constant-weight bitmap null
 
-This file starts the finite combinatorial route for the bitmap candidate
-generation null. The central object is the uniform space of `K`-subsets of a
+This file starts the finite combinatorial route for the constant-weight bitmap
+overlap null. The central object is the uniform space of `K`-subsets of a
 `D`-coordinate universe, represented as `Fin D`.
 
-The main counting bijection identifies overlap-constrained document bitmaps
+The main counting bijection identifies overlap-constrained bitmaps
 with a pair consisting of the `x` coordinates selected inside the query bitmap
 and the `K - x` coordinates selected outside it.
 -/
@@ -29,47 +29,47 @@ and the `K - x` coordinates selected outside it.
 /-- The finite coordinate universe for a bitmap with `D` coordinates. -/
 abbrev BitmapCoord (D : ℕ) := Fin D
 
-/-- The space of constant-composition bitmaps with exactly `K` active coordinates. -/
-def bitmapSpace (D K : ℕ) : Finset (Finset (BitmapCoord D)) :=
+/-- The space of constant-weight bitmaps with exactly `K` active coordinates. -/
+def constantWeightBitmapSpace (D K : ℕ) : Finset (Finset (BitmapCoord D)) :=
   Finset.univ.powersetCard K
 
 @[simp]
-theorem mem_bitmapSpace_iff {D K : ℕ} {s : Finset (BitmapCoord D)} :
-    s ∈ bitmapSpace D K ↔ s.card = K := by
-  simp [bitmapSpace]
+theorem mem_constantWeightBitmapSpace_iff {D K : ℕ} {s : Finset (BitmapCoord D)} :
+    s ∈ constantWeightBitmapSpace D K ↔ s.card = K := by
+  simp [constantWeightBitmapSpace]
 
 /-- The number of `K`-active bitmaps over `D` coordinates is `D.choose K`. -/
 @[simp]
-theorem card_bitmapSpace (D K : ℕ) :
-    (bitmapSpace D K).card = D.choose K := by
-  simp [bitmapSpace]
+theorem card_constantWeightBitmapSpace (D K : ℕ) :
+    (constantWeightBitmapSpace D K).card = D.choose K := by
+  simp [constantWeightBitmapSpace]
 
 /-- The `K`-active bitmap space is nonempty exactly in the feasible case `K <= D`. -/
-theorem bitmapSpace_nonempty {D K : ℕ} (hK : K ≤ D) :
-    (bitmapSpace D K).Nonempty := by
+theorem constantWeightBitmapSpace_nonempty {D K : ℕ} (hK : K ≤ D) :
+    (constantWeightBitmapSpace D K).Nonempty := by
   have hKuniv : K ≤ (Finset.univ : Finset (BitmapCoord D)).card := by
     simpa using hK
-  simpa [bitmapSpace] using
+  simpa [constantWeightBitmapSpace] using
     (Finset.powersetCard_nonempty_of_le (s := (Finset.univ : Finset (BitmapCoord D))) hKuniv)
 
 /-- Bitmap overlap is the cardinality of the bitwise intersection. -/
 def bitmapOverlap {D : ℕ} (q d : Finset (BitmapCoord D)) : ℕ :=
   (q ∩ d).card
 
-/-- The event that a `K`-active document bitmap has overlap exactly `x` with `q`. -/
+/-- The event that a `K`-active bitmap has overlap exactly `x` with `q`. -/
 def bitmapOverlapFiber (D K x : ℕ) (q : Finset (BitmapCoord D)) :
     Finset (Finset (BitmapCoord D)) :=
-  (bitmapSpace D K).filter fun d => bitmapOverlap q d = x
+  (constantWeightBitmapSpace D K).filter fun d => bitmapOverlap q d = x
 
 @[simp]
 theorem mem_bitmapOverlapFiber_iff {D K x : ℕ} {q d : Finset (BitmapCoord D)} :
     d ∈ bitmapOverlapFiber D K x q ↔ d.card = K ∧ bitmapOverlap q d = x := by
   simp [bitmapOverlapFiber]
 
-/-- The event that a `K`-active document bitmap clears threshold `t` against `q`. -/
+/-- The event that a `K`-active bitmap clears threshold `t` against `q`. -/
 def bitmapOverlapTailEvent (D K t : ℕ) (q : Finset (BitmapCoord D)) :
     Finset (Finset (BitmapCoord D)) :=
-  (bitmapSpace D K).filter fun d => t ≤ bitmapOverlap q d
+  (constantWeightBitmapSpace D K).filter fun d => t ≤ bitmapOverlap q d
 
 @[simp]
 theorem mem_bitmapOverlapTailEvent_iff {D K t : ℕ} {q d : Finset (BitmapCoord D)} :
@@ -86,7 +86,7 @@ theorem card_bitmapComplement {D : ℕ} (q : Finset (BitmapCoord D)) :
   simp [bitmapComplement, Finset.card_univ_diff, Fintype.card_fin]
 
 /--
-Structured choices for an overlap-`x` document bitmap:
+Structured choices for an overlap-`x` bitmap:
 choose `x` coordinates inside the query bitmap and `K - x` outside it.
 -/
 def insideOutsideChoices {D : ℕ} (K x : ℕ) (q : Finset (BitmapCoord D)) :
@@ -106,7 +106,7 @@ theorem card_insideOutsideChoices {D K x : ℕ} (q : Finset (BitmapCoord D)) :
       q.card.choose x * (D - q.card).choose (K - x) := by
   simp [insideOutsideChoices]
 
-/-- The hypergeometric numerator for the constant-composition bitmap null. -/
+/-- The hypergeometric numerator for the constant-weight bitmap null. -/
 def bitmapHypergeomNumerator (D K x : ℕ) : ℕ :=
   K.choose x * (D - K).choose (K - x)
 
@@ -230,8 +230,8 @@ noncomputable def bitmapHypergeomTail (D K t : ℕ) : ℝ≥0 :=
   (Finset.range (K + 1)).sum fun x =>
     if t ≤ x then bitmapHypergeomMass D K x else 0
 
-/-- Exact finite false-positive rate of a threshold event, as a cardinal ratio. -/
-noncomputable def bitmapFalsePositiveRate (D K t : ℕ) (q : Finset (BitmapCoord D)) : ℝ≥0 :=
+/-- Exact finite mass of a threshold event, as a cardinal ratio. -/
+noncomputable def bitmapOverlapTailMass (D K t : ℕ) (q : Finset (BitmapCoord D)) : ℝ≥0 :=
   ((bitmapOverlapTailEvent D K t q).card : ℝ≥0) / (D.choose K : ℝ≥0)
 
 /-- The threshold event partitions into exact-overlap fibers over feasible overlap values. -/
@@ -276,13 +276,13 @@ theorem card_bitmapOverlapTailEvent_eq_sum_overlapFiber_card_of_query_card {D K 
       simp at hd
 
 /--
-The closed-form hypergeometric upper tail is the exact finite false-positive
-rate of the constant-composition threshold event.
+The closed-form hypergeometric upper tail is the exact finite mass of the
+constant-weight threshold event.
 -/
-theorem bitmapFalsePositiveRate_eq_bitmapHypergeomTail_of_query_card {D K t : ℕ}
+theorem bitmapOverlapTailMass_eq_bitmapHypergeomTail_of_query_card {D K t : ℕ}
     {q : Finset (BitmapCoord D)} (hq : q.card = K) :
-    bitmapFalsePositiveRate D K t q = bitmapHypergeomTail D K t := by
-  rw [bitmapFalsePositiveRate, bitmapHypergeomTail,
+    bitmapOverlapTailMass D K t q = bitmapHypergeomTail D K t := by
+  rw [bitmapOverlapTailMass, bitmapHypergeomTail,
     card_bitmapOverlapTailEvent_eq_sum_overlapFiber_card_of_query_card hq]
   simp_rw [Nat.cast_sum, Nat.cast_ite, Nat.cast_zero]
   simp_rw [bitmapHypergeomMass_eq_overlapFiber_card_ratio hq]
@@ -294,7 +294,7 @@ theorem bitmapFalsePositiveRate_eq_bitmapHypergeomTail_of_query_card {D K t : �
 /-- Uniform law over all `K`-active bitmaps in dimension `D`. -/
 noncomputable def bitmapUniformPMF (D K : ℕ) (hK : K ≤ D) :
     PMF (Finset (BitmapCoord D)) :=
-  PMF.uniformOfFinset (bitmapSpace D K) (bitmapSpace_nonempty hK)
+  PMF.uniformOfFinset (constantWeightBitmapSpace D K) (constantWeightBitmapSpace_nonempty hK)
 
 @[simp]
 theorem bitmapUniformPMF_apply {D K : ℕ} (hK : K ≤ D) (d : Finset (BitmapCoord D)) :
@@ -312,21 +312,21 @@ private theorem ennreal_natCast_div_choose_eq_coe_nnreal_div {D K a : ℕ} (hK :
   simp
 
 private theorem bitmapUniformPMF_event_prob_eq_card_ratio {D K : ℕ} (hK : K ≤ D)
-    {event : Finset (Finset (BitmapCoord D))} (hevent : event ⊆ bitmapSpace D K) :
+    {event : Finset (Finset (BitmapCoord D))} (hevent : event ⊆ constantWeightBitmapSpace D K) :
     (bitmapUniformPMF D K hK).toOuterMeasure (event : Set (Finset (BitmapCoord D))) =
       (event.card : ℝ≥0∞) / (D.choose K : ℝ≥0∞) := by
   rw [bitmapUniformPMF, PMF.toOuterMeasure_uniformOfFinset_apply]
-  trans ((event.card : ℕ) : ℝ≥0∞) / ((bitmapSpace D K).card : ℝ≥0∞)
+  trans ((event.card : ℕ) : ℝ≥0∞) / ((constantWeightBitmapSpace D K).card : ℝ≥0∞)
   · congr 1
     apply congrArg (fun s : Finset (Finset (BitmapCoord D)) => ((s.card : ℕ) : ℝ≥0∞))
     ext d
     simpa [Finset.mem_filter] using
-      (show (d ∈ bitmapSpace D K ∧ d ∈ event) ↔ d ∈ event from
+      (show (d ∈ constantWeightBitmapSpace D K ∧ d ∈ event) ↔ d ∈ event from
         ⟨And.right, fun hd => ⟨hevent hd, hd⟩⟩)
-  · rw [card_bitmapSpace]
+  · rw [card_constantWeightBitmapSpace]
 
 /--
-Under the uniform law over `K`-active document bitmaps, the probability of exact
+Under the uniform law over `K`-active bitmaps, the probability of exact
 overlap `x` is the closed-form hypergeometric mass.
 -/
 theorem bitmapUniformPMF_overlapFiber_prob {D K x : ℕ} (hK : K ≤ D)
@@ -334,16 +334,16 @@ theorem bitmapUniformPMF_overlapFiber_prob {D K x : ℕ} (hK : K ≤ D)
     (bitmapUniformPMF D K hK).toOuterMeasure
         (bitmapOverlapFiber D K x q : Set (Finset (BitmapCoord D))) =
       (bitmapHypergeomMass D K x : ℝ≥0∞) := by
-  have hsubset : bitmapOverlapFiber D K x q ⊆ bitmapSpace D K := by
+  have hsubset : bitmapOverlapFiber D K x q ⊆ constantWeightBitmapSpace D K := by
     intro d hd
-    exact mem_bitmapSpace_iff.mpr (mem_bitmapOverlapFiber_iff.mp hd).1
+    exact mem_constantWeightBitmapSpace_iff.mpr (mem_bitmapOverlapFiber_iff.mp hd).1
   rw [bitmapUniformPMF_event_prob_eq_card_ratio hK
       (event := bitmapOverlapFiber D K x q) hsubset,
     card_bitmapOverlapFiber_of_query_card hq, bitmapHypergeomMass]
   exact ennreal_natCast_div_choose_eq_coe_nnreal_div hK
 
 /--
-Under the uniform law over `K`-active document bitmaps, the probability of
+Under the uniform law over `K`-active bitmaps, the probability of
 clearing overlap threshold `t` is the closed-form hypergeometric upper tail.
 -/
 theorem bitmapUniformPMF_overlapTail_prob {D K t : ℕ} (hK : K ≤ D)
@@ -351,13 +351,13 @@ theorem bitmapUniformPMF_overlapTail_prob {D K t : ℕ} (hK : K ≤ D)
     (bitmapUniformPMF D K hK).toOuterMeasure
         (bitmapOverlapTailEvent D K t q : Set (Finset (BitmapCoord D))) =
       (bitmapHypergeomTail D K t : ℝ≥0∞) := by
-  have hsubset : bitmapOverlapTailEvent D K t q ⊆ bitmapSpace D K := by
+  have hsubset : bitmapOverlapTailEvent D K t q ⊆ constantWeightBitmapSpace D K := by
     intro d hd
-    exact mem_bitmapSpace_iff.mpr (mem_bitmapOverlapTailEvent_iff.mp hd).1
+    exact mem_constantWeightBitmapSpace_iff.mpr (mem_bitmapOverlapTailEvent_iff.mp hd).1
   rw [bitmapUniformPMF_event_prob_eq_card_ratio hK
       (event := bitmapOverlapTailEvent D K t q) hsubset,
-    ← bitmapFalsePositiveRate_eq_bitmapHypergeomTail_of_query_card hq,
-    bitmapFalsePositiveRate]
+    ← bitmapOverlapTailMass_eq_bitmapHypergeomTail_of_query_card hq,
+    bitmapOverlapTailMass]
   exact ennreal_natCast_div_choose_eq_coe_nnreal_div hK
 
 end OrdvecFormalization

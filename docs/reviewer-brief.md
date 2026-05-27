@@ -1,36 +1,36 @@
-# Reviewer And Builder Brief
+# Constant-Weight Bitmap Overlap Brief
 
-This repository formalizes a finite decision-theoretic claim behind OrdVec-style
-candidate admission. It does not claim that every embedding model satisfies the
-assumptions. It proves what follows when the assumptions hold.
+This repository formalizes a finite decision-theoretic claim about
+constant-weight bitmap overlap admission. It proves what follows when the stated
+finite assumptions hold.
 
 ## The Claim
 
-The checked headline theorem is:
+The checked theorem is:
 
 ```lean
-OrdvecFormalization.ordvec_bitmap_uniform_null_headline_theorem
+OrdvecFormalization.exists_uniformBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail
 ```
 
-It says that, for `K`-active bitmap documents in dimension `D`, if the null is
-uniform over `K`-active bitmap documents and relevance is modeled as a canonical
-finite exponential tilt of that law by literal query-document overlap, then:
+It says that, for `K`-active bitmaps in dimension `D`, if the null is uniform
+over `K`-active bitmaps and the signal law is modeled as a canonical finite
+exponential tilt of that law by literal bitmap overlap, then:
 
 1. some overlap-tail rule is Bayes-optimal among all deterministic rules on the
-   full bitmap-document observation space;
-2. under the uniform constant-composition bitmap null, that same threshold event
+   full constant-weight bitmap observation space;
+2. under the uniform constant-weight bitmap null, that same threshold event
    has exactly the hypergeometric upper-tail probability.
 
 The cost-sensitive version is:
 
 ```lean
-OrdvecFormalization.ordvec_bitmap_uniform_null_costed_headline_theorem
+OrdvecFormalization.exists_uniformBitmapOverlapTail_finiteCostedBayesRisk_le_and_hypergeomTail
 ```
 
 The more general positive-base theorem is:
 
 ```lean
-OrdvecFormalization.ordvec_bitmap_headline_theorem
+OrdvecFormalization.exists_constantWeightBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail
 ```
 
 There the Bayes-optimality result holds for any positive base law, while the
@@ -40,40 +40,39 @@ cutoff.
 ## Glossary
 
 - `K`-active bitmap: a bitmap with exactly `K` active coordinates.
-- Overlap-tail rule: accept a candidate iff query-document overlap is at least a
+- Overlap-tail rule: accept a candidate iff bitmap overlap is at least a
   cutoff.
 - Canonical overlap tilt: a signal model that exponentially reweights a base law
   by overlap evidence.
-- Uniform constant-composition null: the uniform law over all `K`-active
+- Uniform constant-weight null: the uniform law over all `K`-active
   bitmaps.
 - Hypergeometric tail: the exact probability, under that null, of clearing an
   overlap cutoff.
 
 ## Why This Is The Right Shape
 
-Dense retrieval usually treats the encoder score as primitive. This
-formalization treats retrieval as a finite statistical experiment:
+The formalization treats admission as a finite statistical experiment:
 
 ```text
 full observation Z
-ordinal / bitmap quotient Q(Z)
+quotient Q(Z)
 overlap evidence T(Q(Z))
-retrieval decision
+binary admission decision
 ```
 
-If the relevance likelihood ratio factors through the quotient evidence, then
-the quotient loses no Bayes-relevant information for the retrieval decision. If
-that factored evidence is monotone in overlap, the optimal deterministic rule is
-a threshold.
+If the class likelihood ratio factors through the quotient evidence, then the
+quotient loses no Bayes-relevant information for that decision. If that factored
+evidence is monotone in overlap, the optimal deterministic rule is a threshold.
 
-This is a sufficiency theorem, not a representation-learning theorem.
+This is a quotient-sufficiency theorem, not a representation-learning theorem.
 
 ## Assumption Checklist
 
-- finite document space;
+- finite observation space, specialized in the strongest theorem to the
+  constant-weight bitmap subtype;
 - fixed `D`, `K`, and query bitmap `q`;
 - `q.card = K`;
-- uniform `K`-active bitmap null for the strongest headline theorem;
+- uniform `K`-active bitmap null for the strongest checked theorem;
 - positive finite base law for the more general theorem;
 - signal parameter strictly larger than null parameter;
 - deterministic admission rules;
@@ -81,20 +80,21 @@ This is a sufficiency theorem, not a representation-learning theorem.
 
 ## What Builders Get
 
-For an edge-deployable RAG component, the useful engineering consequence is:
+For an implementation that uses constant-weight overlap admission, the useful
+engineering consequence is:
 
 ```text
-when the empirical retrieval contract is approximately true,
+when the empirical decision contract is approximately true,
 candidate admission can be a calibrated popcount threshold
-instead of another dense score computation.
+instead of a full-score computation.
 ```
 
 The Lean development supports the rule shape and the idealized finite null:
 
 - threshold form: optimal under the finite monotone evidence model;
-- bitmap event: the theorem is stated over literal `K`-active bitmap documents;
+- bitmap event: the theorem is stated over literal `K`-active bitmaps;
 - null calibration: the threshold event has a checked hypergeometric tail under
-  the uniform constant-composition bitmap law;
+  the uniform constant-weight bitmap law;
 - costs: asymmetric false-accept / false-reject tradeoffs change the threshold,
   not the rule family.
 
@@ -102,18 +102,25 @@ The Lean development supports the rule shape and the idealized finite null:
 
 The proof is intentionally decomposed:
 
-- `FiniteExperiment.lean`: quotient no-loss theorem for finite experiments.
+- `FiniteExperiment.lean`: quotient-form optimality theorem for finite
+  experiments.
+- `FiniteDecision.lean`: monotone predicates on finite supports are thresholds.
+- `MLR.lean`: monotone likelihood ratio makes Bayes admit predicates monotone.
+- `BayesThreshold.lean`: Bayes thresholds minimize finite pointwise risk.
 - `OrdinalSufficiency.lean`: quotient evidence plus monotonicity gives a
   threshold.
 - `OverlapSufficiency.lean`: specializes the quotient bridge to actual overlap
   coordinates.
 - `CanonicalTilt.lean`: finite exponential tilts make the likelihood ratio a
   monotone function of the evidence.
-- `Headline.lean`: paper-facing theorem names and canonical overlap-tilt
-  results.
+- `ExponentialTilt.lean`: ordered-support exponential tilts have MLR.
+- `FNCH.lean`: actual-overlap FNCH weights match the shifted tilt.
+- `OverlapNull.lean`: overlap-null theorem wrappers and compatibility aliases.
+- `OverlapBayesOptimal.lean`: finite Bayes-risk and cost-sensitive wrappers for
+  the canonical overlap-tilt theorem.
 - `BitmapNull.lean`: exact hypergeometric bitmap overlap null.
 - `BitmapCalibration.lean`: combines the canonical signal model with the exact
-  bitmap null in the headline theorem.
+  bitmap null in the constant-weight bitmap theorem.
 
 Run:
 
@@ -135,9 +142,10 @@ The expected axiom baseline is:
 - Real encoders are not proved to satisfy quotient/factorization assumptions.
 - The hypergeometric null is not claimed to be the deployment null for every
   corpus or embedding model.
-- Ordinal retrieval sufficiency is not representation completeness.
-- Dense magnitudes are not dismissed; they may be necessary for training,
-  transformation, calibration, margins, near-ties, and non-retrieval targets.
+- Quotient sufficiency for one decision is not representation completeness.
+- Full observations are not dismissed; they may be necessary for training,
+  transformation, calibration, margins, near-ties, and targets outside the
+  modeled decision.
 
 ## Empirical Contract
 
@@ -148,7 +156,7 @@ The formalization gives the conditions. A benchmark harness should audit them:
   monotone?
 - Do presumed negatives follow the hypergeometric tail, or a fitted effective
   null?
-- Where does the contract fail: broad queries, cross-domain retrieval,
+- Where does the contract fail: broad queries, cross-domain admission,
   paraphrase, sparse signatures, or near-tie top-K instability?
 
 The theory is strongest when paired with these diagnostics: Lean proves the

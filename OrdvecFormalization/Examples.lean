@@ -15,12 +15,12 @@ namespace OrdvecFormalization
 /-!
 # Concrete theorem-shape examples
 
-This file keeps a tiny concrete instantiation of the final paper-facing theorem
+This file keeps a tiny concrete instantiation of the final bitmap theorem
 in the build so API drift is easy to spot.
 -/
 
 /-- A small feasible FNCH parameter set. -/
-def toyParams : FNCHParams where
+def exampleFNCHParams : FNCHParams where
   N := 10
   k := 4
   draws := 3
@@ -45,25 +45,25 @@ theorem unitDecisionCosts_falseReject_mul_balancedPrior_pos :
   norm_num [balancedPrior, unitDecisionCosts]
 
 /-- A tiny `1`-active bitmap query in three coordinates. -/
-def toyBitmapQuery : Finset (BitmapCoord 3) :=
+def exampleBitmapQuery : Finset (BitmapCoord 3) :=
   {0}
 
 @[simp]
-theorem toyBitmapQuery_card : toyBitmapQuery.card = 1 := by
-  simp [toyBitmapQuery]
+theorem card_exampleBitmapQuery : exampleBitmapQuery.card = 1 := by
+  simp [exampleBitmapQuery]
 
-#check overlapNull_threshold_isBayesOptimal toyParams
+#check overlapNull_threshold_bayesRisk_optimal_of_lt exampleFNCHParams
   (by norm_num : (0 : ℝ) < 1) balancedPrior
 
-#check overlapNull_costed_threshold_isBayesOptimal toyParams
+#check overlapNull_costed_threshold_bayesRisk_optimal_of_lt exampleFNCHParams
   (by norm_num : (0 : ℝ) < 1) balancedPrior unitDecisionCosts
 
-#check ordvec_bitmap_uniform_null_headline_theorem (D := 3) (K := 1)
-  (by norm_num) (q := toyBitmapQuery) toyBitmapQuery_card
+#check exists_uniformBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail (D := 3) (K := 1)
+  (by norm_num) (q := exampleBitmapQuery) card_exampleBitmapQuery
   (by norm_num : (0 : ℝ) < 1) balancedPrior balancedPrior_pos
 
-#check ordvec_bitmap_uniform_null_costed_headline_theorem (D := 3) (K := 1)
-  (by norm_num) (q := toyBitmapQuery) toyBitmapQuery_card
+#check exists_uniformBitmapOverlapTail_finiteCostedBayesRisk_le_and_hypergeomTail (D := 3) (K := 1)
+  (by norm_num) (q := exampleBitmapQuery) card_exampleBitmapQuery
   (by norm_num : (0 : ℝ) < 1) balancedPrior unitDecisionCosts
   unitDecisionCosts_falseReject_mul_balancedPrior_pos
 

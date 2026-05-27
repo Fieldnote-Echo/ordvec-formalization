@@ -12,15 +12,15 @@ open scoped NNReal
 namespace OrdvecFormalization
 
 /-!
-# Overlap-facing quotient sufficiency
+# Quotient sufficiency for overlap evidence
 
 This file specializes the ordered quotient sufficiency theorem to actual overlap
 coordinates.  The observation space is still arbitrary: a quotient map extracts
-an ordinal observation, and an overlap statistic on that quotient lands in the
-feasible FNCH overlap support.
+an observation quotient, and an overlap statistic on that quotient lands in the
+feasible overlap support.
 -/
 
-/-- Pull an actual-overlap threshold back through an ordinal quotient. -/
+/-- Pull an actual-overlap threshold back through a quotient. -/
 def overlapQuotientThresholdSet {Ω Ωq : Type} (p : FNCHParams)
     (Q : Ω → Ωq) (O : Ωq → p.support) (cut : Fin (p.hi - p.lo + 2)) : Set Ω :=
   {ω | O (Q ω) ∈ actualOverlapThresholdSet p cut}
@@ -36,7 +36,7 @@ theorem overlapQuotientThresholdSet_eq_orderedQuotientThresholdSet {Ω Ωq : Typ
     actualOverlapThresholdSet_eq_thresholdSet p cut]
 
 /--
-Overlap-facing factorization condition: the full likelihood ratio is a monotone
+Overlap factorization condition: the full likelihood ratio is a monotone
 function of the actual-overlap evidence extracted from an ordinal quotient.
 -/
 def FiniteLikelihoodRatioFactorsThroughOverlapEvidence {Ω Ωq : Type} [Fintype Ω]
@@ -49,7 +49,7 @@ If the full likelihood ratio factors monotonically through quotient-level
 overlap evidence, then a pulled-back actual-overlap threshold is Bayes-optimal
 among all deterministic full-space admit sets.
 -/
-theorem overlapQuotient_threshold_no_loss_of_overlapEvidenceFactor
+theorem exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_overlapEvidenceFactor
     {Ω Ωq : Type} [Fintype Ω]
     (p : FNCHParams) (Q : Ω → Ωq) (O : Ωq → p.support)
     (p0 p1 : FiniteLaw Ω) (w0 w1 : ℝ≥0) (hw1 : 0 < w1)
@@ -57,18 +57,18 @@ theorem overlapQuotient_threshold_no_loss_of_overlapEvidenceFactor
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set Ω,
       finiteWeightedRisk p0 p1 w0 w1 (overlapQuotientThresholdSet p Q O cut) ≤
         finiteWeightedRisk p0 p1 w0 w1 R := by
-  rcases orderedQuotient_threshold_no_loss_of_orderedEvidenceFactor
+  rcases exists_orderedQuotientThreshold_finiteWeightedRisk_le_of_orderedEvidenceFactor
       Q O p0 p1 w0 w1 hw1 hfactor with ⟨cut, hcut⟩
   refine ⟨cut, ?_⟩
   intro R
   simpa [overlapQuotientThresholdSet_eq_orderedQuotientThresholdSet p Q O cut] using hcut R
 
 /--
-Paper-language alias: under monotone likelihood-ratio factorization through
-ordinal overlap evidence, actual-overlap threshold retrieval is Bayes-optimal
-against all deterministic full-space rules.
+Under monotone likelihood-ratio factorization through quotient-level overlap
+evidence, an actual-overlap threshold is Bayes-optimal against all
+deterministic full-space rules.
 -/
-theorem ordinal_overlap_threshold_bayes_optimal_of_likelihoodRatioFactor
+theorem exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_likelihoodRatioFactor
     {Ω Ωq : Type} [Fintype Ω]
     (p : FNCHParams) (Q : Ω → Ωq) (O : Ωq → p.support)
     (p0 p1 : FiniteLaw Ω) (w0 w1 : ℝ≥0) (hw1 : 0 < w1)
@@ -76,6 +76,7 @@ theorem ordinal_overlap_threshold_bayes_optimal_of_likelihoodRatioFactor
     ∃ cut : Fin (p.hi - p.lo + 2), ∀ R : Set Ω,
       finiteWeightedRisk p0 p1 w0 w1 (overlapQuotientThresholdSet p Q O cut) ≤
         finiteWeightedRisk p0 p1 w0 w1 R :=
-  overlapQuotient_threshold_no_loss_of_overlapEvidenceFactor p Q O p0 p1 w0 w1 hw1 hfactor
+  exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_overlapEvidenceFactor
+    p Q O p0 p1 w0 w1 hw1 hfactor
 
 end OrdvecFormalization

@@ -13,7 +13,7 @@ namespace OrdvecFormalization
 /-!
 # Finite statistical experiments and quotient sufficiency
 
-This file contains the representation-free decision layer.  The observation
+This file contains the finite quotient decision layer. The observation
 space is an arbitrary finite type.  A quotient map can safely replace the full
 observation exactly when the pointwise Bayes evidence is constant on quotient
 fibers; likelihood-ratio factorization is one sufficient condition.
@@ -131,12 +131,12 @@ theorem quotientBayesAdmitSet_pullback_eq {Ω Ωq : Type} [Fintype Ω]
     exact ⟨ω, rfl, hω⟩
 
 /--
-No-loss theorem for quotient retrieval.
+Bayes-optimal quotient decision rule.
 
 If the pointwise weighted Bayes evidence is constant on quotient fibers, then a
 quotient-form rule is globally Bayes-optimal against all full-space rules.
 -/
-theorem quotient_bayes_no_loss {Ω Ωq : Type} [Fintype Ω]
+theorem exists_quotientPullback_finiteWeightedRisk_le {Ω Ωq : Type} [Fintype Ω]
     (Q : Ω → Ωq) (p0 p1 : FiniteLaw Ω) (w0 w1 : ℝ≥0)
     (hfactor : FiniteBayesAdmitFactorsThrough Q p0 p1 w0 w1) :
     ∃ Rq : Set Ωq, ∀ R : Set Ω,
@@ -177,88 +177,80 @@ theorem finiteBayesAdmitFactorsThrough_of_likelihoodRatioFactorsThrough {Ω Ωq 
     finiteWeightedBayesAdmit_iff_cutoff_le_likelihoodRatio p0 p1 hw1 ω₂,
     hφ ω₁, hφ ω₂, hQ]
 
-/--
-No-loss theorem from likelihood-ratio factorization.
-
-If the full likelihood ratio factors through the quotient, then for any positive
-reject-side weight there is a Bayes-optimal quotient-form rule.
--/
-theorem quotient_bayes_no_loss_of_likelihoodRatioFactorsThrough {Ω Ωq : Type}
+/-- Likelihood-ratio factorization gives a Bayes-optimal quotient-form rule. -/
+theorem exists_quotientPullback_finiteWeightedRisk_le_of_likelihoodRatioFactorsThrough {Ω Ωq : Type}
     [Fintype Ω] (Q : Ω → Ωq) (p0 p1 : FiniteLaw Ω) (w0 w1 : ℝ≥0)
     (hw1 : 0 < w1) (hlr : FiniteLikelihoodRatioFactorsThrough Q p0 p1) :
     ∃ Rq : Set Ωq, ∀ R : Set Ω,
       finiteWeightedRisk p0 p1 w0 w1 (quotientPullback Q Rq) ≤
         finiteWeightedRisk p0 p1 w0 w1 R :=
-  quotient_bayes_no_loss Q p0 p1 w0 w1
+  exists_quotientPullback_finiteWeightedRisk_le Q p0 p1 w0 w1
     (finiteBayesAdmitFactorsThrough_of_likelihoodRatioFactorsThrough Q p0 p1 hw1 hlr)
 
 /-!
-## Retrieval sufficiency is not representation completeness
+## Quotient sufficiency is not fiber completeness
 
-The following toy observation separates an ordinal coordinate from a
+The following finite observation separates an ordinal coordinate from a
 magnitude/degeneracy coordinate.  The ordinal quotient is sufficient for the
-retrieval target, but it cannot predict a second target that varies inside an
-ordinal fiber.
+quotient target, but it cannot predict a second target that varies inside an
+ordinal quotient fiber.
 -/
 
-/-- Toy dense observation with an ordinal coordinate and a magnitude coordinate. -/
-abbrev DenseToyObs := Bool × Bool
+/-- Example observation with an ordinal coordinate and a fiber coordinate. -/
+abbrev QuotientFiberExampleObs := Bool × Bool
 
 /-- The ordinal quotient keeps only the first coordinate. -/
-def denseToyQuotient (z : DenseToyObs) : Bool :=
+def quotientFiberExampleQuotient (z : QuotientFiberExampleObs) : Bool :=
   z.1
 
-/-- Toy retrieval target: depends only on ordinal identity. -/
-def denseToyRetrievalTarget (z : DenseToyObs) : Bool :=
+/-- Quotient target: depends only on ordinal identity. -/
+def quotientFiberExampleQuotientTarget (z : QuotientFiberExampleObs) : Bool :=
   z.1
 
-/-- Toy transformation target: depends on the discarded magnitude coordinate. -/
-def denseToyTransformationTarget (z : DenseToyObs) : Bool :=
+/-- Fiber target: depends on the discarded coordinate. -/
+def quotientFiberExampleFiberTarget (z : QuotientFiberExampleObs) : Bool :=
   z.2
 
-/-- The toy retrieval target factors through the ordinal quotient. -/
-theorem denseToy_retrievalTarget_factorsThrough :
-    RuleFactorsThrough denseToyQuotient denseToyRetrievalTarget := by
+/-- The quotient target factors through the ordinal quotient. -/
+theorem quotientFiberExample_quotientTarget_factorsThrough :
+    RuleFactorsThrough quotientFiberExampleQuotient quotientFiberExampleQuotientTarget := by
   refine ⟨id, ?_⟩
   intro z
   rfl
 
-/-- The toy retrieval target is perfectly predictable from the ordinal quotient. -/
-theorem denseToy_retrievalTarget_predictable_by_quotient :
-    ∃ δq : Bool → Bool, ∀ z : DenseToyObs,
-      δq (denseToyQuotient z) = denseToyRetrievalTarget z := by
+/-- The quotient target is perfectly predictable from the ordinal quotient. -/
+theorem quotientFiberExample_quotientTarget_predictable_by_quotient :
+    ∃ δq : Bool → Bool, ∀ z : QuotientFiberExampleObs,
+      δq (quotientFiberExampleQuotient z) = quotientFiberExampleQuotientTarget z := by
   refine ⟨id, ?_⟩
   intro z
   rfl
 
-/-- The discarded coordinate is perfectly predictable from the full dense observation. -/
-theorem denseToy_transformationTarget_predictable_by_full_observation :
-    ∃ δ : DenseToyObs → Bool, RulePredicts δ denseToyTransformationTarget := by
-  exact ⟨denseToyTransformationTarget, fun _ => rfl⟩
+/-- The discarded coordinate is perfectly predictable from the full observation. -/
+theorem quotientFiberExample_fiberTarget_predictable_by_fullObservation :
+    ∃ δ : QuotientFiberExampleObs → Bool, RulePredicts δ quotientFiberExampleFiberTarget := by
+  exact ⟨quotientFiberExampleFiberTarget, fun _ => rfl⟩
 
-/-- The toy transformation target does not factor through the ordinal quotient. -/
-theorem denseToy_transformationTarget_not_factorsThrough :
-    ¬ RuleFactorsThrough denseToyQuotient denseToyTransformationTarget := by
+/-- The fiber target does not factor through the ordinal quotient. -/
+theorem quotientFiberExample_fiberTarget_not_factorsThrough :
+    ¬ RuleFactorsThrough quotientFiberExampleQuotient quotientFiberExampleFiberTarget := by
   rintro ⟨δq, hδ⟩
   have h0 : δq false = false := by
-    simpa [denseToyQuotient, denseToyTransformationTarget] using
+    simpa [quotientFiberExampleQuotient, quotientFiberExampleFiberTarget] using
       (hδ (false, false)).symm
   have h1 : δq false = true := by
-    simpa [denseToyQuotient, denseToyTransformationTarget] using
+    simpa [quotientFiberExampleQuotient, quotientFiberExampleFiberTarget] using
       (hδ (false, true)).symm
   rw [h0] at h1
   cases h1
 
-/--
-Toy witness that ordinal structure can be retrieval-sufficient without being
-representation-complete.
--/
-theorem denseToy_retrieval_sufficient_not_representation_complete :
-    (RuleFactorsThrough denseToyQuotient denseToyRetrievalTarget) ∧
-      (¬ RuleFactorsThrough denseToyQuotient denseToyTransformationTarget) ∧
-        (∃ δ : DenseToyObs → Bool, RulePredicts δ denseToyTransformationTarget) := by
-  exact ⟨denseToy_retrievalTarget_factorsThrough,
-    denseToy_transformationTarget_not_factorsThrough,
-    denseToy_transformationTarget_predictable_by_full_observation⟩
+/-- Finite witness separating quotient-factorable and non-quotient-factorable targets. -/
+theorem quotientFiberExample_quotientTarget_factorsThrough_not_fiberTarget :
+    (RuleFactorsThrough quotientFiberExampleQuotient quotientFiberExampleQuotientTarget) ∧
+      (¬ RuleFactorsThrough quotientFiberExampleQuotient quotientFiberExampleFiberTarget) ∧
+        (∃ δ : QuotientFiberExampleObs → Bool, RulePredicts δ quotientFiberExampleFiberTarget) := by
+  exact ⟨quotientFiberExample_quotientTarget_factorsThrough,
+    quotientFiberExample_fiberTarget_not_factorsThrough,
+    quotientFiberExample_fiberTarget_predictable_by_fullObservation⟩
 
 end OrdvecFormalization
