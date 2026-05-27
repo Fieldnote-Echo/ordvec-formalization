@@ -5,6 +5,7 @@ Authors: Nelson Spence
 -/
 
 import OrdvecFormalization.BitmapNull
+import Mathlib.Algebra.Group.Action.Pointwise.Finset
 import Mathlib.Algebra.Pointwise.Stabilizer
 import Mathlib.GroupTheory.Perm.Finite
 
@@ -118,15 +119,13 @@ theorem mem_permuteBitmap_iff {D : ℕ} (σ : BitmapPerm D)
     (d : Finset (BitmapCoord D)) (x : BitmapCoord D) :
     x ∈ permuteBitmap σ d ↔ σ.symm x ∈ d := by
   classical
+  rw [permuteBitmap]
+  simp only [Finset.mem_smul_finset, Equiv.Perm.smul_def]
   constructor
+  · rintro ⟨y, hy, rfl⟩
+    simpa using hy
   · intro hx
-    rcases Finset.mem_smul_finset.mp hx with ⟨y, hy, hxy⟩
-    have hyx : y = σ.symm x := by
-      apply σ.injective
-      simpa [Equiv.Perm.smul_def] using hxy
-    simpa [hyx] using hy
-  · intro hx
-    exact Finset.mem_smul_finset.mpr ⟨σ.symm x, hx, by simp [Equiv.Perm.smul_def]⟩
+    exact ⟨σ.symm x, hx, by simp⟩
 
 @[simp]
 theorem card_permuteBitmap {D : ℕ} (σ : BitmapPerm D)
@@ -166,24 +165,12 @@ theorem bitmapOverlap_queryStabilizer_eq {D : ℕ}
     (hσ : σ ∈ queryStabilizer q) :
     bitmapOverlap q (permuteBitmap σ d) = bitmapOverlap q d := by
   classical
-  unfold bitmapOverlap
-  apply Finset.card_bij
-    (fun x _hx => σ.symm x)
-    ?maps
-    ?inj
-    ?surj
-  · intro x hx
-    rw [Finset.mem_inter] at hx ⊢
-    exact ⟨(queryStabilizer_apply_mem_iff hσ (σ.symm x)).mp (by simpa using hx.1), by
-      exact (mem_permuteBitmap_iff σ d x).mp hx.2⟩
-  · intro x _hx y _hy hxy
-    exact σ.symm.injective hxy
-  · intro y hy
-    rw [Finset.mem_inter] at hy
-    refine ⟨σ y, ?_, by simp⟩
-    rw [Finset.mem_inter]
-    exact ⟨(queryStabilizer_apply_mem_iff hσ y).mpr hy.1, by
-      exact (mem_permuteBitmap_iff σ d (σ y)).mpr (by simpa using hy.2)⟩
+  have hq : σ • q = q := MulAction.mem_stabilizer_iff.mp hσ
+  unfold bitmapOverlap permuteBitmap
+  calc
+    (q ∩ σ • d).card = (σ • q ∩ σ • d).card := by rw [hq]
+    _ = (σ • (q ∩ d)).card := by rw [← Finset.smul_finset_inter]
+    _ = (q ∩ d).card := by rw [Finset.card_smul_finset]
 
 /-- Overlap is constant on each query-stabilizer orbit of a document bitmap. -/
 theorem bitmapOverlap_eq_of_mem_queryStabilizer_orbit {D : ℕ}
@@ -295,7 +282,7 @@ invariant under query-preserving coordinate permutations factors through
 literal query-document overlap.
 -/
 theorem invariantOn_constantWeightBitmapSpace_factorsThrough_overlap
-    {D K : ℕ} (q : Finset (BitmapCoord D)) {β : Type} [Inhabited β]
+    {D K : ℕ} (q : Finset (BitmapCoord D)) {β : Type}
     (F : Finset (BitmapCoord D) → β)
     (hInv : ∀ σ : queryStabilizer q, ∀ d : Finset (BitmapCoord D),
       d ∈ constantWeightBitmapSpace D K →
@@ -308,7 +295,7 @@ theorem invariantOn_constantWeightBitmapSpace_factorsThrough_overlap
         d.card = K ∧ bitmapOverlap q d = x then
       F h.choose
     else
-      default
+      F ∅
   refine ⟨f, ?_⟩
   intro d hd
   have hwitness :
