@@ -105,8 +105,12 @@ The proof is intentionally decomposed:
 - `FiniteExperiment.lean`: quotient no-loss theorem for finite experiments.
 - `OrdinalSufficiency.lean`: quotient evidence plus monotonicity gives a
   threshold.
+- `OverlapSufficiency.lean`: specializes the quotient bridge to actual overlap
+  coordinates.
 - `CanonicalTilt.lean`: finite exponential tilts make the likelihood ratio a
   monotone function of the evidence.
+- `Headline.lean`: paper-facing theorem names and canonical overlap-tilt
+  results.
 - `BitmapNull.lean`: exact hypergeometric bitmap overlap null.
 - `BitmapCalibration.lean`: combines the canonical signal model with the exact
   bitmap null in the headline theorem.
