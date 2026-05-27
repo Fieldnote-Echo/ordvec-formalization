@@ -119,6 +119,10 @@ The proof is intentionally decomposed:
 - `OverlapBayesOptimal.lean`: finite Bayes-risk and cost-sensitive wrappers for
   the canonical overlap-tilt theorem.
 - `BitmapNull.lean`: exact hypergeometric bitmap overlap null.
+- `BitmapSymmetry.lean`: query-stabilizer coordinate permutations preserve
+  overlap, same-overlap equal-cardinality bitmaps lie in the same
+  query-stabilizer orbit, and invariant constant-weight bitmap statistics
+  factor through overlap.
 - `BitmapCalibration.lean`: combines the canonical signal model with the exact
   bitmap null in the constant-weight bitmap theorem.
 
@@ -140,6 +144,9 @@ The expected axiom baseline is:
 ## What Is Not Claimed
 
 - Real encoders are not proved to satisfy quotient/factorization assumptions.
+- Real encoders are not proved to satisfy the query-stabilizer symmetry
+  assumption; the symmetry theorem identifies the canonical invariant when that
+  assumption is appropriate.
 - The hypergeometric null is not claimed to be the deployment null for every
   corpus or embedding model.
 - Quotient sufficiency for one decision is not representation completeness.

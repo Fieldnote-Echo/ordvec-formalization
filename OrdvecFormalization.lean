@@ -6,4 +6,5 @@ import OrdvecFormalization.CanonicalTilt
 import OrdvecFormalization.OverlapBayesOptimal
 import OrdvecFormalization.BitmapCalibration
 import OrdvecFormalization.BitmapNull
+import OrdvecFormalization.BitmapSymmetry
 import OrdvecFormalization.OverlapNull

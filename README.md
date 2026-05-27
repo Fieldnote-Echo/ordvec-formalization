@@ -177,6 +177,14 @@ OrdvecFormalization.bitmapUniformPMF_overlapFiber_prob
 OrdvecFormalization.bitmapUniformPMF_overlapTail_prob
 ```
 
+Bitmap symmetry / maximal invariant layer:
+
+```lean
+OrdvecFormalization.bitmapOverlap_queryStabilizer_eq
+OrdvecFormalization.exists_queryStabilizer_permuteBitmap_eq_iff_overlap_eq_of_card_eq
+OrdvecFormalization.invariantOn_constantWeightBitmapSpace_factorsThrough_overlap
+```
+
 Quotient-to-threshold sufficiency bridge:
 
 ```lean
@@ -229,6 +237,11 @@ A shorter guided read for reviewers and builders is in
   specializes the full observation space to the `K`-active bitmap subtype and
   proves the Bayes-optimal pulled-back threshold is exactly the literal bitmap
   overlap tail event.
+- `BitmapSymmetry.lean`: group-theoretic layer for the quotient. Query-stabilizer
+  coordinate permutations preserve overlap; among equal-cardinality bitmaps,
+  query-stabilizer orbits are exactly same-overlap classes; every
+  query-stabilizer-invariant statistic on constant-weight bitmaps factors
+  through literal overlap.
 - `FiniteDecision.lean`: monotone predicates on `Fin (n + 1)` are thresholds.
 - `MLR.lean`: cross-multiplication MLR makes weighted Bayes admit predicates
   monotone and connects admission to a likelihood-ratio cutoff.
@@ -252,7 +265,8 @@ Expected axiom baseline:
 ## Scope
 
 This proves an optimality theorem for the admission rule under the stated finite
-model, a quotient-form optimality theorem under explicit factorization assumptions, and
+model, a quotient-form optimality theorem under explicit factorization
+assumptions, a group-theoretic maximal-invariant theorem for bitmap overlap, and
 the exact constant-weight bitmap overlap null. It does not prove that real
 encoders satisfy the quotient/factorization contract, it does not prove that the
 textbook hypergeometric is the deployment null for real embeddings, and it does

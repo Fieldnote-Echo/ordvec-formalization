@@ -2,8 +2,9 @@
 
 This document maps the checked Lean theorem surface. It is deliberately narrow:
 the formalization proves finite Bayes decision theorems, a quotient-form
-optimality theorem, a canonical overlap-tilt signal instantiation, and an exact
-constant-weight bitmap null.
+optimality theorem, a canonical overlap-tilt signal instantiation, a
+group-theoretic bitmap-overlap invariant theorem, and an exact constant-weight
+bitmap null.
 
 ## Main Claim
 
@@ -58,6 +59,15 @@ OrdvecFormalization.bitmapUniformPMF_overlapFiber_prob
 OrdvecFormalization.bitmapUniformPMF_overlapTail_prob
 ```
 
+Bitmap symmetry layer:
+
+```lean
+OrdvecFormalization.bitmapOverlap_queryStabilizer_eq
+OrdvecFormalization.exists_queryStabilizer_permuteBitmap_eq_of_card_eq_overlap_eq
+OrdvecFormalization.exists_queryStabilizer_permuteBitmap_eq_iff_overlap_eq_of_card_eq
+OrdvecFormalization.invariantOn_constantWeightBitmapSpace_factorsThrough_overlap
+```
+
 Quotient sufficiency layer:
 
 ```lean
@@ -98,9 +108,13 @@ FiniteExperiment
 
 BitmapNull
   -> BitmapCalibration
+  -> BitmapSymmetry
 
 BitmapCalibration
   -> exists_uniformBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail
+
+BitmapSymmetry
+  -> invariantOn_constantWeightBitmapSpace_factorsThrough_overlap
 ```
 
 ## Proof Spine
@@ -227,6 +241,15 @@ BitmapCalibration
    tail. The `bitmapUniformPMF_*` theorems package the same statements as
    probabilities under the uniform `PMF` over `K`-active bitmaps.
 
+14. `BitmapSymmetry.lean`
+   This gives the group-theoretic explanation for the bitmap quotient. It
+   defines the coordinate permutation group and query stabilizer, proves that
+   query-stabilizer permutations preserve literal overlap, constructs a
+   query-stabilizer permutation between any two equal-cardinality bitmaps with
+   the same query overlap, and packages the maximal-invariant consequence:
+   every query-stabilizer-invariant statistic on the constant-weight bitmap
+   space factors through literal overlap.
+
 ## Public Names
 
 Core theorem names:
@@ -296,6 +319,14 @@ Core theorem names:
 - `bitmapUniformPMF`
 - `bitmapUniformPMF_overlapFiber_prob`
 - `bitmapUniformPMF_overlapTail_prob`
+- `BitmapPerm`
+- `queryStabilizer`
+- `permuteBitmap`
+- `bitmapOverlap_queryStabilizer_eq`
+- `exists_queryStabilizer_permuteBitmap_eq_of_card_eq_overlap_eq`
+- `exists_queryStabilizer_permuteBitmap_eq_iff_overlap_eq_of_card_eq`
+- `invariantOn_constantWeightBitmapSpace_eq_of_overlap_eq`
+- `invariantOn_constantWeightBitmapSpace_factorsThrough_overlap`
 
 Compatibility aliases:
 
@@ -314,6 +345,10 @@ Compatibility aliases:
 - No claim is made that a real encoder's semantic evidence actually factors
   through an ordinal quotient; the quotient theorem states the exact sufficient
   condition under which such compression is decision-theoretically lossless.
+- No claim is made that real encoders satisfy the query-stabilizer symmetry
+  assumption. The symmetry theorem identifies the canonical invariant when the
+  bitmap problem is treated as invariant under query-preserving coordinate
+  relabelings.
 - No claim is made that quotient sufficiency for one decision makes the quotient
   representation-complete. The checked finite witness shows a quotient can
   preserve one target while provably discarding another.

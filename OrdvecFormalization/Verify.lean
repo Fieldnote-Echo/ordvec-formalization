@@ -6,6 +6,7 @@ Authors: Nelson Spence
 
 import OrdvecFormalization.Examples
 import OrdvecFormalization.BitmapNull
+import OrdvecFormalization.BitmapSymmetry
 import OrdvecFormalization.FiniteExperiment
 import OrdvecFormalization.OrdinalSufficiency
 import OrdvecFormalization.OverlapSufficiency
@@ -48,6 +49,32 @@ namespace OrdvecFormalization
 #check @bitmapUniformPMF_apply
 #check @bitmapUniformPMF_overlapFiber_prob
 #check @bitmapUniformPMF_overlapTail_prob
+#check @BitmapPerm
+#check @queryStabilizer
+#check @permuteBitmap
+#check @bitmapQueryPart
+#check @bitmapQueryComplPart
+#check @mem_bitmapQueryPart_iff
+#check @mem_bitmapQueryComplPart_iff
+#check @card_bitmapQueryPart_eq_overlap
+#check @card_bitmapQueryComplPart_eq_card_sub_overlap
+#check @card_bitmapQueryPart_eq_of_overlap_eq
+#check @card_bitmapQueryComplPart_eq_of_card_eq_of_overlap_eq
+#check @mem_permuteBitmap_iff
+#check @card_permuteBitmap
+#check @mem_constantWeightBitmapSpace_permuteBitmap_iff
+#check @permuteBitmap_mem_constantWeightBitmapSpace
+#check @mem_queryStabilizer_iff
+#check @queryStabilizer_apply_mem_iff
+#check @bitmapOverlap_queryStabilizer_eq
+#check @bitmapOverlap_eq_of_mem_queryStabilizer_orbit
+#check @subtypeCongr_query_mem_iff
+#check @subtypeCongr_mem_queryStabilizer
+#check @subtypeCongr_permuteBitmap_eq_of_parts
+#check @exists_queryStabilizer_permuteBitmap_eq_of_card_eq_overlap_eq
+#check @exists_queryStabilizer_permuteBitmap_eq_iff_overlap_eq_of_card_eq
+#check @invariantOn_constantWeightBitmapSpace_eq_of_overlap_eq
+#check @invariantOn_constantWeightBitmapSpace_factorsThrough_overlap
 #check @FiniteLaw
 #check @finiteLawOfPosPMF
 #check @finiteWeightedBayesAdmit
@@ -204,6 +231,10 @@ namespace OrdvecFormalization
 #print axioms bitmapUniformPMF_apply
 #print axioms bitmapUniformPMF_overlapFiber_prob
 #print axioms bitmapUniformPMF_overlapTail_prob
+#print axioms bitmapOverlap_queryStabilizer_eq
+#print axioms exists_queryStabilizer_permuteBitmap_eq_of_card_eq_overlap_eq
+#print axioms exists_queryStabilizer_permuteBitmap_eq_iff_overlap_eq_of_card_eq
+#print axioms invariantOn_constantWeightBitmapSpace_factorsThrough_overlap
 #print axioms finiteWeightedBayesAdmitSet_optimal
 #print axioms finiteLawProb
 #print axioms mem_quotientPullback_of_quotient_preserving
