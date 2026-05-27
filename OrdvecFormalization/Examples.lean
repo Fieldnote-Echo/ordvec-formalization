@@ -31,7 +31,15 @@ noncomputable def balancedPrior : Prior where
   prob := (1 / 2 : ℝ≥0)
   le_one := by norm_num
 
+/-- Unit false-decision costs for example statements. -/
+def unitDecisionCosts : DecisionCosts where
+  falseAccept := 1
+  falseReject := 1
+
 #check overlapNull_threshold_isBayesOptimal toyParams
   (by norm_num : (0 : ℝ) < 1) balancedPrior
+
+#check overlapNull_costed_threshold_isBayesOptimal toyParams
+  (by norm_num : (0 : ℝ) < 1) balancedPrior unitDecisionCosts
 
 end OrdvecFormalization

@@ -138,4 +138,23 @@ theorem exponentialTilt_threshold_bayesRisk_optimal {n : ℕ} (base : PosWeights
   threshold_bayesRisk_optimal (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior
     (exponentialTilt_hasMLR base hθ)
 
+/-- Cost-sensitive Bayes admit sets for increasing exponential tilts are thresholds. -/
+theorem exponentialTilt_costedBayesAdmit_isThreshold {n : ℕ} (base : PosWeights n)
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (n + 2), ∀ x : Support n,
+      costedBayesAdmit (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior costs x ↔
+        x ∈ thresholdSet n cut :=
+  costedBayesAdmit_isThreshold (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior
+    costs (exponentialTilt_hasMLR base hθ)
+
+/-- Cost-sensitive Bayes risk for increasing exponential tilts is minimized by a threshold rule. -/
+theorem exponentialTilt_costed_threshold_bayesRisk_optimal {n : ℕ} (base : PosWeights n)
+    {θ₀ θ₁ : ℝ} (hθ : θ₀ ≤ θ₁) (prior : Prior) (costs : DecisionCosts) :
+    ∃ cut : Fin (n + 2), ∀ R : Set (Support n),
+      costedBayesRisk (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior costs
+          (thresholdSet n cut) ≤
+        costedBayesRisk (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior costs R :=
+  costed_threshold_bayesRisk_optimal (exponentialTilt base θ₀) (exponentialTilt base θ₁) prior
+    costs (exponentialTilt_hasMLR base hθ)
+
 end OrdvecFormalization

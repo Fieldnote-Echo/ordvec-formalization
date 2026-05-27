@@ -17,43 +17,92 @@ The finite Bayes risk is a pointwise sum. Under MLR, the pointwise Bayes admit
 predicate is monotone, hence a threshold, and that threshold minimizes the risk.
 -/
 
-/-- Finite Bayes risk for an arbitrary deterministic admit set. -/
-noncomputable def bayesRisk {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
+/-- Finite weighted Bayes risk for an arbitrary deterministic admit set. -/
+noncomputable def weightedBayesRisk {n : ℕ} (p0 p1 : PosPMF n) (w0 w1 : ℝ≥0)
     (R : Set (Support n)) : ℝ≥0 :=
   by
     classical
     exact Finset.univ.sum fun x : Support n =>
-      if x ∈ R then prior.compl * p0.mass x else prior.prob * p1.mass x
+      if x ∈ R then w0 * p0.mass x else w1 * p1.mass x
+
+/-- Finite Bayes risk for an arbitrary deterministic admit set. -/
+noncomputable def bayesRisk {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
+    (R : Set (Support n)) : ℝ≥0 :=
+  weightedBayesRisk p0 p1 prior.compl prior.prob R
+
+/-- Cost-sensitive Bayes admission predicate. -/
+def costedBayesAdmit {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
+    (costs : DecisionCosts) (x : Support n) : Prop :=
+  weightedBayesAdmit p0 p1 (costs.falseAccept * prior.compl)
+    (costs.falseReject * prior.prob) x
+
+/-- Finite cost-sensitive Bayes risk for an arbitrary deterministic admit set. -/
+noncomputable def costedBayesRisk {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
+    (costs : DecisionCosts) (R : Set (Support n)) : ℝ≥0 :=
+  weightedBayesRisk p0 p1 (costs.falseAccept * prior.compl)
+    (costs.falseReject * prior.prob) R
+
+/-- Under MLR, any weighted Bayes admit set is represented by a threshold. -/
+theorem weightedBayesAdmit_isThreshold {n : ℕ} (p0 p1 : PosPMF n)
+    (w0 w1 : ℝ≥0) (hmlr : HasMLR p0 p1) :
+    ∃ cut : Fin (n + 2), ∀ x : Support n,
+      weightedBayesAdmit p0 p1 w0 w1 x ↔ x ∈ thresholdSet n cut :=
+  exists_threshold_of_monotone_pred n (weightedBayesAdmit p0 p1 w0 w1)
+    (mlr_monotone_weightedBayesAdmit p0 p1 w0 w1 hmlr)
 
 /-- Under MLR, the Bayes admit set is represented by a threshold. -/
 theorem bayesAdmit_isThreshold {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
     (hmlr : HasMLR p0 p1) :
     ∃ cut : Fin (n + 2), ∀ x : Support n,
       bayesAdmit p0 p1 prior x ↔ x ∈ thresholdSet n cut :=
-  exists_threshold_of_monotone_pred n (bayesAdmit p0 p1 prior)
-    (mlr_monotone_bayesAdmit p0 p1 prior hmlr)
+  weightedBayesAdmit_isThreshold p0 p1 prior.compl prior.prob hmlr
+
+/-- Under MLR, any cost-sensitive Bayes admit set is represented by a threshold. -/
+theorem costedBayesAdmit_isThreshold {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
+    (costs : DecisionCosts) (hmlr : HasMLR p0 p1) :
+    ∃ cut : Fin (n + 2), ∀ x : Support n,
+      costedBayesAdmit p0 p1 prior costs x ↔ x ∈ thresholdSet n cut :=
+  weightedBayesAdmit_isThreshold p0 p1 (costs.falseAccept * prior.compl)
+    (costs.falseReject * prior.prob) hmlr
+
+/-- The weighted Bayes admit rule minimizes finite weighted Bayes risk. -/
+theorem weighted_threshold_bayesRisk_optimal {n : ℕ} (p0 p1 : PosPMF n)
+    (w0 w1 : ℝ≥0) (hmlr : HasMLR p0 p1) :
+    ∃ cut : Fin (n + 2), ∀ R : Set (Support n),
+      weightedBayesRisk p0 p1 w0 w1 (thresholdSet n cut) ≤
+        weightedBayesRisk p0 p1 w0 w1 R := by
+  rcases weightedBayesAdmit_isThreshold p0 p1 w0 w1 hmlr with ⟨cut, hcut⟩
+  refine ⟨cut, ?_⟩
+  intro R
+  dsimp [weightedBayesRisk]
+  refine Finset.sum_le_sum ?_
+  intro x _hx
+  by_cases hT : x ∈ thresholdSet n cut
+  · have hA : weightedBayesAdmit p0 p1 w0 w1 x := (hcut x).mpr hT
+    by_cases hR : x ∈ R
+    · simp [hT, hR]
+    · simpa [hT, hR, weightedBayesAdmit] using hA
+  · have hA : ¬ weightedBayesAdmit p0 p1 w0 w1 x := fun hx => hT ((hcut x).mp hx)
+    by_cases hR : x ∈ R
+    · have hReject : w1 * p1.mass x ≤ w0 * p0.mass x :=
+        le_of_lt (lt_of_not_ge hA)
+      simpa [hT, hR, weightedBayesAdmit] using hReject
+    · simp [hT, hR]
 
 /-- The threshold Bayes admit rule minimizes finite Bayes risk. -/
 theorem threshold_bayesRisk_optimal {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
     (hmlr : HasMLR p0 p1) :
     ∃ cut : Fin (n + 2), ∀ R : Set (Support n),
-      bayesRisk p0 p1 prior (thresholdSet n cut) ≤ bayesRisk p0 p1 prior R := by
-  rcases bayesAdmit_isThreshold p0 p1 prior hmlr with ⟨cut, hcut⟩
-  refine ⟨cut, ?_⟩
-  intro R
-  dsimp [bayesRisk]
-  refine Finset.sum_le_sum ?_
-  intro x _hx
-  by_cases hT : x ∈ thresholdSet n cut
-  · have hA : bayesAdmit p0 p1 prior x := (hcut x).mpr hT
-    by_cases hR : x ∈ R
-    · simp [hT, hR]
-    · simpa [hT, hR, bayesAdmit] using hA
-  · have hA : ¬ bayesAdmit p0 p1 prior x := fun hx => hT ((hcut x).mp hx)
-    by_cases hR : x ∈ R
-    · have hReject : prior.prob * p1.mass x ≤ prior.compl * p0.mass x :=
-        le_of_lt (lt_of_not_ge hA)
-      simpa [hT, hR, bayesAdmit] using hReject
-    · simp [hT, hR]
+      bayesRisk p0 p1 prior (thresholdSet n cut) ≤ bayesRisk p0 p1 prior R :=
+  weighted_threshold_bayesRisk_optimal p0 p1 prior.compl prior.prob hmlr
+
+/-- The cost-sensitive Bayes admit rule minimizes finite cost-sensitive Bayes risk. -/
+theorem costed_threshold_bayesRisk_optimal {n : ℕ} (p0 p1 : PosPMF n) (prior : Prior)
+    (costs : DecisionCosts) (hmlr : HasMLR p0 p1) :
+    ∃ cut : Fin (n + 2), ∀ R : Set (Support n),
+      costedBayesRisk p0 p1 prior costs (thresholdSet n cut) ≤
+        costedBayesRisk p0 p1 prior costs R :=
+  weighted_threshold_bayesRisk_optimal p0 p1 (costs.falseAccept * prior.compl)
+    (costs.falseReject * prior.prob) hmlr
 
 end OrdvecFormalization
