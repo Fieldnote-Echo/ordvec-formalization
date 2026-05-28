@@ -48,6 +48,9 @@ jobs:
       - name: Verify theorem dashboard
         run: make verify
 
+      - name: Check documented theorem names
+        run: make check-doc-names
+
       - name: Audit for proof placeholders
         run: make audit
 

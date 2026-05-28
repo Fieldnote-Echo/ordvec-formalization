@@ -60,9 +60,14 @@ overlap evidence T(Q(Z))
 binary admission decision
 ```
 
-If the class likelihood ratio factors through the quotient evidence, then the
-quotient loses no Bayes-relevant information for that decision. If that factored
-evidence is monotone in overlap, the optimal deterministic rule is a threshold.
+The proof separates three claims that are easy to blur:
+
+- symmetry: for constant-weight bitmaps, overlap classifies the orbits of the
+  query-stabilizer action;
+- decision theory: if the class likelihood ratio factors through that evidence
+  and is monotone in it, the optimal deterministic rule is a threshold;
+- null calibration: under the uniform constant-weight bitmap null, the threshold
+  event has the hypergeometric upper-tail probability.
 
 This is a quotient-sufficiency theorem, not a representation-learning theorem.
 
@@ -84,9 +89,9 @@ For an implementation that uses constant-weight overlap admission, the useful
 engineering consequence is:
 
 ```text
-when the empirical decision contract is approximately true,
+under an empirically validated monotone-overlap decision contract,
 candidate admission can be a calibrated popcount threshold
-instead of a full-score computation.
+instead of an arbitrary accept/reject rule.
 ```
 
 The Lean development supports the rule shape and the idealized finite null:
@@ -131,6 +136,7 @@ Run:
 ```sh
 make build
 make verify
+make check-doc-names
 make audit
 make lint
 ```
