@@ -101,156 +101,26 @@ two error types independently.
 ## Dependency Shape
 
 ```text
+BitmapSymmetry
+  -> overlap is the query-stabilizer orbit classifier
+
 FiniteExperiment
   -> OrdinalSufficiency / OverlapSufficiency
-  -> CanonicalTilt
+  -> CanonicalTilt / OverlapBayesOptimal
   -> BitmapCalibration
 
 BitmapNull
   -> BitmapCalibration
-  -> BitmapSymmetry
-
-BitmapCalibration
-  -> exists_uniformBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail
-
-BitmapSymmetry
-  -> invariantOn_constantWeightBitmapSpace_factorsThrough_overlap
+  -> exact hypergeometric null calibration
 ```
 
-## Proof Spine
-
-1. `FiniteExperiment.lean`
-   This is the finite quotient decision layer. It
-   defines arbitrary finite positive laws, finite weighted risk, quotient
-   pullbacks, and proves `exists_quotientPullback_finiteWeightedRisk_le`: if pointwise Bayes evidence
-   is constant on quotient fibers, then some quotient-form admit set has no
-   larger risk than any full-space admit set. The theorem
-   `exists_quotientPullback_finiteWeightedRisk_le_of_likelihoodRatioFactorsThrough` gives the
-   likelihood-ratio version: if the full likelihood ratio factors through a
-   quotient map, then positive reject-side weights admit a Bayes-optimal
-   quotient-form rule. The finite example theorem
-   `quotientFiberExample_quotientTarget_factorsThrough_not_fiberTarget` witnesses the
-   intended boundary: a quotient can be sufficient for one decision target while
-   failing to preserve a second target that varies inside quotient fibers.
-
-2. `OrdinalSufficiency.lean`
-   This composes the quotient layer with ordered evidence. It defines
-   `orderedQuotientThresholdSet`, an evidence threshold pulled back through a
-   quotient map, and proves
-   `exists_orderedQuotientThreshold_finiteWeightedRisk_le_of_orderedEvidenceFactor`: if the full
-   likelihood ratio is a monotone function of ordered quotient evidence, then
-   some pulled-back ordinal threshold has no larger weighted Bayes risk than any
-   deterministic full-space admit set.
-
-3. `OverlapSufficiency.lean`
-   This specializes the previous theorem to actual-overlap coordinates. It
-   defines `overlapQuotientThresholdSet`, proves it is the same pulled-back set
-   as `orderedQuotientThresholdSet`, and exposes
-   `exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_likelihoodRatioFactor`: if the
-   full likelihood ratio factors monotonically through quotient-level
-   overlap evidence, then an actual-overlap threshold is Bayes-optimal among all
-   deterministic full-space rules.
-
-4. `CanonicalTilt.lean`
-   This instantiates the factorization contract with a canonical finite
-   exponential family over arbitrary full observations. It defines
-   `finiteExponentialTilt`, proves
-   `finiteLikelihoodRatio_finiteExponentialTilt_eq_factor`, and packages the
-   result as `exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_canonicalTilt`: if a positive
-   full-space base law is tilted by quotient-level overlap evidence, then the
-   resulting likelihood ratio factors monotonically through that evidence, so a
-   pulled-back actual-overlap threshold is Bayes-optimal among all deterministic
-   full-space rules.
-
-5. `OverlapBayesOptimal.lean`
-   This is the finite Bayes-risk wrapper. It defines generic full-observation
-   `finiteBayesRisk` and `finiteCostedBayesRisk`, then exposes
-   `exists_overlapQuotientThreshold_finiteBayesRisk_le_of_canonicalTilt`,
-   `exists_overlapQuotientThreshold_finiteCostedBayesRisk_le_of_canonicalTilt`, and
-   `exists_overlapQuotientThreshold_finiteBayesRisk_le_of_canonicalTilt_of_lt`.
-   The strict cost-sensitive wrapper is
-   `exists_overlapQuotientThreshold_finiteCostedBayesRisk_le_of_canonicalTilt_of_lt`.
-   The strict-parameter version says that, under the canonical overlap-tilt
-   model, a pulled-back actual-overlap threshold is optimal among all
-   deterministic full-space rules.
-
-6. `BitmapCalibration.lean`
-   This connects the canonical overlap-tilt theorem to the exact
-   constant-weight bitmap null. It builds the FNCH overlap parameters for
-   two `K`-active bitmaps in dimension `D`, obtains the Bayes-optimal
-   actual-overlap cutoff from the canonical signal theorem, and proves that the
-   uniform bitmap null assigns the corresponding threshold event exactly the
-   hypergeometric upper-tail probability. The theorem
-   `exists_overlapQuotientThreshold_finiteBayesRisk_le_and_bitmapHypergeomTail`
-   is the checked "optimal under the signal model, tail-calibrated under the
-   bitmap null" bridge. The concrete theorem
-   `exists_constantWeightBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail`
-   specializes the full observation space to the `K`-active bitmap subtype and
-   proves that the Bayes-optimal pulled-back threshold set is exactly the
-   literal bitmap overlap tail event.
-
-7. `FiniteDecision.lean`
-   `exists_threshold_of_monotone_pred` proves that every monotone predicate on
-   `Fin (n + 1)` is represented by a threshold cut in `Fin (n + 2)`. The two
-   extra boundary cuts encode accept-all and reject-all rules.
-
-8. `MLR.lean`
-   `HasMLR` states monotone likelihood ratio by cross multiplication:
-   `p1 x * p0 y <= p1 y * p0 x` for `x <= y`.
-   `mlr_monotone_weightedBayesAdmit` proves that this makes any weighted
-   pointwise Bayes admit predicate monotone. Positivity of `p0.mass x` is used
-   exactly at the final cancellation step. The theorem
-   `bayesAdmit_iff_priorOddsCutoff_le_likelihoodRatio` connects the
-   cross-multiplied statement to the usual likelihood-ratio cutoff. The cutoff
-   constants themselves carry the positive-denominator witness, so degenerate
-   zero-`H1` or zero reject-side weight cases are not given an odds-threshold
-   interpretation by the API.
-
-9. `BayesThreshold.lean`
-   `bayesAdmit_isThreshold` turns monotone Bayes admission into a threshold.
-   `threshold_bayesRisk_optimal` proves optimality by `Finset.sum_le_sum`,
-   since finite Bayes risk decomposes pointwise over support points.
-   `costed_threshold_bayesRisk_optimal` gives the same result with independent
-   false-accept and false-reject costs.
-
-10. `ExponentialTilt.lean`
-   `exponentialTilt_hasMLR` proves that positive finite base weights tilted by
-   `exp (theta * x)` have MLR as `theta` increases.
-
-11. `FNCH.lean`
-   `fnchActualPMF_mass_eq_fnchPMF_mass` connects literal actual-overlap FNCH
-   weights
-   `choose k x * choose (N-k) (draws-x) * exp(theta*x)`
-   to the shifted exponential-tilt implementation after normalization.
-   `fnchActual_actualOverlapThreshold_bayesRisk_optimal_of_lt` gives the
-   strict-parameter FNCH threshold optimality theorem.
-
-12. `OverlapNull.lean`
-   `overlapNull_threshold_bayesRisk_optimal_of_lt` is the core FNCH overlap theorem. The
-   final aliases in that file keep compatibility names available without
-   duplicating the proof.
-
-13. `BitmapNull.lean`
-   This gives the independent exact-null route for constant-weight bitmap
-   overlap. It defines `constantWeightBitmapSpace`, overlap fibers, tail events,
-   and the structured inside/outside choice space whose cardinality is the
-   hypergeometric numerator. The main counting theorem
-   `card_bitmapOverlapFiber_of_query_card` proves the overlap-fiber cardinality,
-   and `bitmapOverlapTailMass_eq_bitmapHypergeomTail_of_query_card` identifies
-   the threshold-event cardinal ratio with the closed-form hypergeometric upper
-   tail. The `bitmapUniformPMF_*` theorems package the same statements as
-   probabilities under the uniform `PMF` over `K`-active bitmaps.
-
-14. `BitmapSymmetry.lean`
-   This gives the group-theoretic explanation for the bitmap quotient. It
-   defines the coordinate permutation group and query stabilizer, proves that
-   query-stabilizer permutations preserve literal overlap, constructs a
-   query-stabilizer permutation between any two equal-cardinality bitmaps with
-   the same query overlap, and packages the maximal-invariant consequence:
-   every query-stabilizer-invariant statistic on the constant-weight bitmap
-   space factors through literal overlap.
+For the module-by-module proof narrative, see [`proof-spine.md`](proof-spine.md).
 
 ## Public Names
+
+This section is the stable public theorem-name surface. Renames should be
+deliberate, documented changes because downstream docs and papers cite these
+names.
 
 Core theorem names:
 
@@ -364,12 +234,15 @@ Run:
 ```sh
 make build
 make verify
+make check-doc-names
 make audit
 make lint
 ```
 
-`make verify` checks all public theorem names and prints their axiom audit.
-Expected axioms are Lean's standard baseline:
+`make verify` checks the public theorem dashboard and prints the axiom audit.
+`make check-doc-names` extracts documented names from the markdown files and
+checks that they resolve through Lean. Expected axioms are Lean's standard
+baseline:
 
 ```text
 [propext, Classical.choice, Quot.sound]
