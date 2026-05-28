@@ -19,8 +19,11 @@ DOC_PATHS = [
 ]
 THEOREM_MAP = ROOT / "docs" / "theorem-map.md"
 
-QUALIFIED_RE = re.compile(r"\bOrdvecFormalization\.([A-Za-z_][A-Za-z0-9_']*)\b")
-BACKTICK_NAME_RE = re.compile(r"`([A-Za-z_][A-Za-z0-9_']*)`")
+IDENT = r"[A-Za-z_][A-Za-z0-9_']*"
+LEAN_NAME = rf"{IDENT}(?:\.{IDENT})*"
+
+QUALIFIED_RE = re.compile(rf"\bOrdvecFormalization\.({LEAN_NAME})\b")
+BACKTICK_NAME_RE = re.compile(rf"`({LEAN_NAME})`")
 
 
 def markdown_names() -> set[str]:
@@ -33,23 +36,27 @@ def markdown_names() -> set[str]:
 
 def public_surface_names() -> set[str]:
     text = THEOREM_MAP.read_text(encoding="utf-8")
-    start = text.find("## Public Names")
-    end = text.find("## What Is Not Claimed")
-    if start == -1 or end == -1 or end <= start:
+    start_match = re.search(r"^## Public Names\s*$", text, flags=re.MULTILINE)
+    if start_match is None:
         raise RuntimeError("Could not find the Public Names section in docs/theorem-map.md")
-    block = text[start:end]
-    return set(BACKTICK_NAME_RE.findall(block))
+
+    block_start = start_match.end()
+    next_h2_match = re.search(r"^## ", text[block_start:], flags=re.MULTILINE)
+    block_end = block_start + next_h2_match.start() if next_h2_match else len(text)
+    block = text[block_start:block_end]
+    names = set(BACKTICK_NAME_RE.findall(block))
+    if not names:
+        raise RuntimeError("Public Names section in docs/theorem-map.md has no backticked names")
+    return names
 
 
 def lean_check(names: list[str]) -> str:
     lines = [
         "import OrdvecFormalization",
         "",
-        "namespace OrdvecFormalization",
-        "",
     ]
-    lines.extend(f"#check @{name}" for name in names)
-    lines.extend(["", "end OrdvecFormalization", ""])
+    lines.extend(f"#check @OrdvecFormalization.{name}" for name in names)
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -59,11 +66,9 @@ def main() -> int:
         print("No documented OrdvecFormalization names found.", file=sys.stderr)
         return 1
 
-    with tempfile.NamedTemporaryFile("w", suffix=".lean", delete=False, encoding="utf-8") as f:
-        f.write(lean_check(names))
-        temp_path = Path(f.name)
-
-    try:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        temp_path = Path(tmpdir) / "check_doc_names.lean"
+        temp_path.write_text(lean_check(names), encoding="utf-8")
         result = subprocess.run(
             ["lake", "env", "lean", str(temp_path)],
             cwd=ROOT,
@@ -71,8 +76,6 @@ def main() -> int:
             capture_output=True,
             check=False,
         )
-    finally:
-        temp_path.unlink(missing_ok=True)
 
     if result.returncode != 0:
         print("Documented Lean name check failed.", file=sys.stderr)
