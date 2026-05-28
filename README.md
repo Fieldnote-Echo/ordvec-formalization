@@ -1,11 +1,21 @@
 # ordvec-formalization
 
 [![Lean CI](https://github.com/Fieldnote-Echo/ordvec-formalization/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/Fieldnote-Echo/ordvec-formalization/actions/workflows/lean_action_ci.yml)
+[![No sorry](https://img.shields.io/badge/no%20sorry-audited-brightgreen)](https://github.com/Fieldnote-Echo/ordvec-formalization/actions/workflows/lean_action_ci.yml)
 
 Lean 4 formalization of a finite constant-weight bitmap overlap model: under an
 explicit monotone overlap signal contract, an overlap-tail admission rule is
 Bayes-optimal, and its idealized uniform-null probability is exactly
 hypergeometric.
+
+This is a theory of **decision sufficiency through a quotient**, not
+**representation completeness**. Full observations may still be essential for forming,
+transforming, training, calibrating, and composing semantic representations.
+They can carry margins, near-ties, residual features, confidence, and other
+signals that matter for tasks beyond candidate admission. The formal result
+says only that, for a binary admission decision satisfying the stated
+statistical contract, the decision surface can factor through an order-like
+quotient.
 
 ## Why This Matters
 
@@ -70,7 +80,7 @@ Pinned to Lean `v4.28.0` and Mathlib `v4.28.0`.
 
 ```sh
 lake update     # first run only; fetches Mathlib
-make build
+make build      # runs lake build --wfail
 make verify
 make check-doc-names
 make audit
@@ -80,6 +90,8 @@ make lint
 GitHub Actions runs the same build, verification, documentation-name guard,
 audit, and linter checks in
 [`.github/workflows/lean_action_ci.yml`](.github/workflows/lean_action_ci.yml).
+The `--wfail` build treats Lean warnings, including `sorry`, as failures; the
+separate audit checks Lean sources for proof-placeholder contamination.
 
 ## License
 

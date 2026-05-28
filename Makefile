@@ -10,7 +10,8 @@ check-doc-names:
 	python3 scripts/check_doc_names.py
 
 audit:
-	! rg -n '\bsorry\b|sorryAx' OrdvecFormalization OrdvecFormalization.lean README.md docs scripts
+	! rg -n '\bsorry\b|sorryAx' OrdvecFormalization OrdvecFormalization.lean
+	! rg -n 'sorryAx' README.md docs scripts
 
 lint:
 	lake exe runLinter OrdvecFormalization
