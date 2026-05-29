@@ -60,12 +60,14 @@ overlap evidence T(Q(Z))
 binary admission decision
 ```
 
-The proof separates three claims that are easy to blur:
+The proof separates four claims that are easy to blur:
 
 - symmetry: for constant-weight bitmaps, overlap classifies the orbits of the
   query-stabilizer action;
 - decision theory: if the class likelihood ratio factors through that evidence
   and is monotone in it, the optimal deterministic rule is a threshold;
+- calibrated evidence: a supplied ordered-tail equality is packaged at the same
+  Bayes-optimal cutoff without asserting deployment-null adequacy;
 - null calibration: under the uniform constant-weight bitmap null, the threshold
   event has the hypergeometric upper-tail probability.
 
@@ -114,10 +116,14 @@ The proof is intentionally decomposed:
 - `BayesThreshold.lean`: Bayes thresholds minimize finite pointwise risk.
 - `OrdinalSufficiency.lean`: quotient evidence plus monotonicity gives a
   threshold.
+- `CalibratedEvidence.lean`: supplied ordered-tail calibration travels with the
+  selected Bayes-optimal cutoff.
 - `OverlapSufficiency.lean`: specializes the quotient bridge to actual overlap
   coordinates.
 - `CanonicalTilt.lean`: finite exponential tilts make the likelihood ratio a
   monotone function of the evidence.
+- `BitmapIncidence.lean`: literal bitmap overlap evidence and bitmap-tail event
+  bridges.
 - `ExponentialTilt.lean`: ordered-support exponential tilts have MLR.
 - `FNCH.lean`: actual-overlap FNCH weights match the shifted tilt.
 - `OverlapNull.lean`: overlap-null theorem wrappers and compatibility aliases.

@@ -5,6 +5,7 @@ Authors: Nelson Spence
 -/
 
 import OrdvecFormalization.CanonicalTilt
+import OrdvecFormalization.FiniteBayesRisk
 
 open scoped NNReal
 
@@ -18,17 +19,6 @@ statements about finite Bayes risk.  The proofs are intentionally thin: the
 mathematical work lives in `FiniteExperiment`, `OrdinalSufficiency`,
 `OverlapSufficiency`, and `CanonicalTilt`.
 -/
-
-/-- Finite Bayes risk for arbitrary full observations. -/
-noncomputable def finiteBayesRisk {Ω : Type} [Fintype Ω] (p0 p1 : FiniteLaw Ω)
-    (prior : Prior) (R : Set Ω) : ℝ≥0 :=
-  finiteWeightedRisk p0 p1 prior.compl prior.prob R
-
-/-- Finite cost-sensitive Bayes risk for arbitrary full observations. -/
-noncomputable def finiteCostedBayesRisk {Ω : Type} [Fintype Ω] (p0 p1 : FiniteLaw Ω)
-    (prior : Prior) (costs : DecisionCosts) (R : Set Ω) : ℝ≥0 :=
-  finiteWeightedRisk p0 p1 (costs.falseAccept * prior.compl)
-    (costs.falseReject * prior.prob) R
 
 /--
 Under the canonical finite model where one law is an exponential tilt of a
