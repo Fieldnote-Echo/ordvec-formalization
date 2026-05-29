@@ -1,9 +1,12 @@
 -- OrdvecFormalization — root module.
 import OrdvecFormalization.FiniteExperiment
+import OrdvecFormalization.FiniteBayesRisk
 import OrdvecFormalization.OrdinalSufficiency
+import OrdvecFormalization.CalibratedEvidence
 import OrdvecFormalization.OverlapSufficiency
 import OrdvecFormalization.CanonicalTilt
 import OrdvecFormalization.OverlapBayesOptimal
+import OrdvecFormalization.BitmapIncidence
 import OrdvecFormalization.BitmapCalibration
 import OrdvecFormalization.BitmapNull
 import OrdvecFormalization.BitmapSymmetry

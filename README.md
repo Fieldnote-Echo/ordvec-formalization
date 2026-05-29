@@ -8,6 +8,10 @@ explicit monotone overlap signal contract, an overlap-tail admission rule is
 Bayes-optimal, and its idealized uniform-null probability is exactly
 hypergeometric.
 
+The development now also packages supplied ordered-tail calibration with the
+Bayes-optimal cutoff. This matters because the finite bitmap hypergeometric
+calibration remains explicit, not a hidden claim about real deployment corpora.
+
 This is a theory of **decision sufficiency through a quotient**, not
 **representation completeness**. Full observations may still be essential for forming,
 transforming, training, calibrating, and composing semantic representations.

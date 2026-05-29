@@ -3,8 +3,8 @@
 This document maps the checked Lean theorem surface. It is deliberately narrow:
 the formalization proves finite Bayes decision theorems, a quotient-form
 optimality theorem, a canonical overlap-tilt signal instantiation, a
-group-theoretic bitmap-overlap invariant theorem, and an exact constant-weight
-bitmap null.
+group-theoretic bitmap-overlap invariant theorem, a supplied calibrated-evidence
+wrapper, and an exact constant-weight bitmap null.
 
 ## Main Claim
 
@@ -74,10 +74,13 @@ Quotient sufficiency layer:
 OrdvecFormalization.exists_quotientPullback_finiteWeightedRisk_le
 OrdvecFormalization.exists_quotientPullback_finiteWeightedRisk_le_of_likelihoodRatioFactorsThrough
 OrdvecFormalization.exists_orderedQuotientThreshold_finiteWeightedRisk_le_of_orderedEvidenceFactor
+OrdvecFormalization.exists_calibratedOrderedThreshold_finiteBayesRisk_le_of_orderedEvidenceFactor
+OrdvecFormalization.exists_calibratedOrderedThreshold_finiteCostedBayesRisk_le_of_orderedEvidenceFactor
 OrdvecFormalization.exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_likelihoodRatioFactor
 OrdvecFormalization.exists_overlapQuotientThreshold_finiteWeightedRisk_le_of_canonicalTilt
 OrdvecFormalization.exists_overlapQuotientThreshold_finiteBayesRisk_le_of_canonicalTilt_of_lt
 OrdvecFormalization.exists_overlapQuotientThreshold_finiteBayesRisk_le_and_bitmapHypergeomTail
+OrdvecFormalization.constantWeightBitmapOverlapTailCalibration
 OrdvecFormalization.exists_constantWeightBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail
 OrdvecFormalization.exists_uniformBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail
 OrdvecFormalization.quotientFiberExample_quotientTarget_factorsThrough_not_fiberTarget
@@ -105,11 +108,17 @@ BitmapSymmetry
   -> overlap is the query-stabilizer orbit classifier
 
 FiniteExperiment
+  -> FiniteBayesRisk
   -> OrdinalSufficiency / OverlapSufficiency
   -> CanonicalTilt / OverlapBayesOptimal
-  -> BitmapCalibration
+
+FiniteBayesRisk + OrdinalSufficiency
+  -> CalibratedEvidence
 
 BitmapNull
+  -> BitmapIncidence
+
+CalibratedEvidence + BitmapIncidence + OverlapBayesOptimal
   -> BitmapCalibration
   -> exact hypergeometric null calibration
 ```
@@ -135,6 +144,9 @@ Core theorem names:
 - `FiniteLikelihoodRatioFactorsThroughOrderedEvidence`
 - `exists_orderedQuotientThreshold_finiteWeightedRisk_le_of_monotone`
 - `exists_orderedQuotientThreshold_finiteWeightedRisk_le_of_orderedEvidenceFactor`
+- `OrderedTailCalibration`
+- `exists_calibratedOrderedThreshold_finiteBayesRisk_le_of_orderedEvidenceFactor`
+- `exists_calibratedOrderedThreshold_finiteCostedBayesRisk_le_of_orderedEvidenceFactor`
 - `overlapQuotientThresholdSet`
 - `overlapQuotientThresholdSet_eq_orderedQuotientThresholdSet`
 - `FiniteLikelihoodRatioFactorsThroughOverlapEvidence`
@@ -153,10 +165,14 @@ Core theorem names:
 - `exists_overlapQuotientThreshold_finiteBayesRisk_le_of_canonicalTilt_of_lt`
 - `exists_overlapQuotientThreshold_finiteCostedBayesRisk_le_of_canonicalTilt_of_lt`
 - `bitmapOverlapParams`
+- `BitmapCut`
+- `bitmapCutThreshold`
 - `ConstantWeightBitmap`
+- `constantWeightBitmapUniformLaw`
 - `constantWeightBitmapOverlapTailSet`
 - `constantWeightBitmapOverlapEvidence`
 - `overlapQuotientThresholdSet_constantWeightBitmapOverlapEvidence_eq`
+- `constantWeightBitmapOverlapTailCalibration`
 - `exists_overlapQuotientThreshold_finiteBayesRisk_le_and_bitmapHypergeomTail`
 - `exists_overlapQuotientThreshold_finiteCostedBayesRisk_le_and_bitmapHypergeomTail`
 - `exists_constantWeightBitmapOverlapTail_finiteBayesRisk_le_and_hypergeomTail`
@@ -210,6 +226,9 @@ Compatibility aliases:
 - No empirical null calibration theorem is formalized here. The new bitmap-null
   route concerns the exact idealized constant-weight null, not real-corpus
   independence or effective dimension.
+- `CalibratedEvidence.lean` packages a supplied equality at the cutoff returned
+  by the ordered Bayes-optimality theorem. It does not prove null adequacy,
+  event equivalence, or any real-corpus calibration claim.
 - No claim is made that the textbook hypergeometric is the deployment null for
   real embeddings.
 - No claim is made that a real encoder's semantic evidence actually factors
