@@ -49,8 +49,8 @@ equally likely. There are `10 choose 3 = 120` possible documents. The number
 with overlap at least 2 is:
 
 ```text
-overlap = 2: choose 2 query bits and 1 non-query bit = (3 choose 2) * (7 choose 1) = 21
-overlap = 3: choose all 3 query bits and 0 non-query bits = (3 choose 3) * (7 choose 0) = 1
+overlap = 2: choose 2 active bits from the 3 query coordinates and 1 from the 7 non-query coordinates = (3 choose 2) * (7 choose 1) = 21
+overlap = 3: choose 3 active bits from the 3 query coordinates and 0 from the 7 non-query coordinates = (3 choose 3) * (7 choose 0) = 1
 tail count = 22
 tail probability = 22 / 120
 ```
@@ -165,11 +165,10 @@ Treat the proof as a design contract for evaluation:
 3. Check whether relevance or likelihood ratio is roughly monotone in overlap.
 4. Pick candidate cutoffs and measure recall, false accepts, reranker cost, and
    downstream answer quality.
-5. Compare observed negative tails against the hypergeometric null or a fitted
-   effective null.
+5. Compare observed null-distribution tails against the hypergeometric null or
+   a fitted effective null.
 6. Use the cutoff only in regimes where the monotone-overlap contract holds.
 
 If those checks fail, the theorem is still useful: it tells you exactly which
 contract failed, rather than leaving the threshold as an unexplained tuning
 constant.
-
