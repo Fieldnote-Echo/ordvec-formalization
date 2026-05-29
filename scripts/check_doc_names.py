@@ -16,6 +16,7 @@ DOC_PATHS = [
     ROOT / "docs" / "theorem-map.md",
     ROOT / "docs" / "reviewer-brief.md",
     ROOT / "docs" / "proof-spine.md",
+    ROOT / "docs" / "rag-pipeline-guide.md",
 ]
 THEOREM_MAP = ROOT / "docs" / "theorem-map.md"
 
