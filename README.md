@@ -58,6 +58,8 @@ uniform bitmap null.
 For the theorem-name surface, see [`docs/theorem-map.md`](docs/theorem-map.md).
 For the module-by-module proof path, see [`docs/proof-spine.md`](docs/proof-spine.md).
 For a reviewer-oriented summary, see [`docs/reviewer-brief.md`](docs/reviewer-brief.md).
+For a developer-facing worked example, see
+[`docs/rag-pipeline-guide.md`](docs/rag-pipeline-guide.md).
 
 ## Scope
 

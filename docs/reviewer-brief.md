@@ -4,6 +4,9 @@ This repository formalizes a finite decision-theoretic claim about
 constant-weight bitmap overlap admission. It proves what follows when the stated
 finite assumptions hold.
 
+For a developer-facing version of the same result in vector DB and RAG terms,
+see [`rag-pipeline-guide.md`](rag-pipeline-guide.md).
+
 ## The Claim
 
 The checked theorem is:
